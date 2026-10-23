@@ -10,6 +10,7 @@ import { SignInPage, SignUpPage, ForgotPasswordPage, UpdatePasswordPage, AuthCal
 import { WorkspacePage } from './pages/WorkspacePage';
 import { HubsPage } from './pages/HubsPage';
 import { FilesPage } from './pages/FilesPage';
+import { WorkspaceDashboard } from './pages/WorkspaceDashboard';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -42,6 +43,19 @@ function AuthRedirect({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// All providers wrapper
+function AppProviders({ children }: { children: React.ReactNode }) {
+  return (
+    <WorkspaceProvider>
+      <WorkspaceManagementProvider>
+        <FileProvider>
+          {children}
+        </FileProvider>
+      </WorkspaceManagementProvider>
+    </WorkspaceProvider>
+  );
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -52,53 +66,39 @@ function AppRoutes() {
       <Route path="/auth/update-password" element={<UpdatePasswordPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       
-      {/* Onboarding — needs WorkspaceProvider for preferences */}
+      {/* Onboarding */}
       <Route path="/onboarding" element={
         <ProtectedRoute>
-          <WorkspaceProvider>
-            <WorkspaceManagementProvider>
-              <OnboardingPage />
-            </WorkspaceManagementProvider>
-          </WorkspaceProvider>
+          <AppProviders>
+            <OnboardingPage />
+          </AppProviders>
         </ProtectedRoute>
       } />
 
-      {/* Workspace — main app with all providers */}
+      {/* Workspace dashboard (home) */}
       <Route path="/workspace" element={
         <ProtectedRoute>
-          <WorkspaceProvider>
-            <WorkspaceManagementProvider>
-              <FileProvider>
-                <WorkspacePage />
-              </FileProvider>
-            </WorkspaceManagementProvider>
-          </WorkspaceProvider>
+          <AppProviders>
+            <WorkspacePage />
+          </AppProviders>
         </ProtectedRoute>
       } />
 
       {/* Hubs */}
       <Route path="/hubs" element={
         <ProtectedRoute>
-          <WorkspaceProvider>
-            <WorkspaceManagementProvider>
-              <FileProvider>
-                <WorkspacePage />
-              </FileProvider>
-            </WorkspaceManagementProvider>
-          </WorkspaceProvider>
+          <AppProviders>
+            <WorkspacePage />
+          </AppProviders>
         </ProtectedRoute>
       } />
 
       {/* Files */}
       <Route path="/files" element={
         <ProtectedRoute>
-          <WorkspaceProvider>
-            <WorkspaceManagementProvider>
-              <FileProvider>
-                <WorkspacePage />
-              </FileProvider>
-            </WorkspaceManagementProvider>
-          </WorkspaceProvider>
+          <AppProviders>
+            <WorkspacePage />
+          </AppProviders>
         </ProtectedRoute>
       } />
 

@@ -8,12 +8,14 @@ import {
   FolderOpen, MessageSquare, Plus, Settings, LogOut, User,
   Cloud, CloudOff, Pin, Trash2, Edit3, Check, X, Menu, ChevronRight,
   Sparkles, Send, Bot, Loader2, Zap, Globe, HardDrive,
-  Shield, RefreshCw, Database, CheckCircle, AlertCircle, Clock
+  Shield, RefreshCw, Database, CheckCircle, AlertCircle, Clock, TrendingUp
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace, Project, Conversation, Message } from '../contexts/WorkspaceContext';
 import { HubsPage } from './HubsPage';
 import { FilesPage } from './FilesPage';
+import { WorkspaceDashboard } from './WorkspaceDashboard';
+import { GlobalSearch } from '../components/GlobalSearch';
 
 // ============ SIDEBAR ============
 function Sidebar({ activeView, setActiveView, selectedProject, setSelectedProject, selectedConversation, setSelectedConversation }: {
@@ -64,8 +66,20 @@ function Sidebar({ activeView, setActiveView, selectedProject, setSelectedProjec
         </div>
       </div>
 
+      {/* Search */}
+      <div className="px-3 mb-3">
+        <GlobalSearch />
+      </div>
+
       {/* Navigation */}
       <div className="p-3 space-y-1">
+        <button
+          onClick={() => { setActiveView('dashboard'); setSelectedProject(null); setSelectedConversation(null); }}
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${activeView === 'dashboard' ? 'bg-violet-500/10 text-violet-300' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'}`}
+        >
+          <TrendingUp size={16} />
+          <span>Dashboard</span>
+        </button>
         <button
           onClick={() => { setActiveView('projects'); setSelectedProject(null); setSelectedConversation(null); }}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${activeView === 'projects' ? 'bg-violet-500/10 text-violet-300' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'}`}
@@ -946,7 +960,7 @@ function SettingsPanel() {
 
 // ============ MAIN WORKSPACE PAGE ============
 export function WorkspacePage() {
-  const [activeView, setActiveView] = useState('projects');
+  const [activeView, setActiveView] = useState('dashboard');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -987,7 +1001,9 @@ export function WorkspacePage() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {activeView === 'hubs' ? (
+        {activeView === 'dashboard' ? (
+          <WorkspaceDashboard />
+        ) : activeView === 'hubs' ? (
           <HubsPage />
         ) : activeView === 'files' ? (
           <FilesPage />
