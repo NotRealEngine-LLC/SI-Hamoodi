@@ -23,7 +23,7 @@ let stripeClient: any = null;
 /**
  * Initialize Stripe client (server-side only)
  */
-async function getStripeClient() {
+export async function getStripeClient() {
   if (!STRIPE_SECRET_KEY) {
     console.warn('Stripe secret key not configured');
     return null;
