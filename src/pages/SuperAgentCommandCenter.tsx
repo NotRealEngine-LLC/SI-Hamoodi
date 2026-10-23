@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   Zap, Play, Pause, X, CheckCircle, AlertCircle, Clock, 
   List, GitBranch, Eye, Edit3, Trash2, ChevronRight,
@@ -13,6 +14,7 @@ import { useWorkspaceManagement } from '../contexts/WorkspaceManagementContext';
 import type { AgentRun, ExecutionPlan, RunStatus } from '../lib/super-agent/types';
 
 export function SuperAgentCommandCenter() {
+  const navigate = useNavigate();
   const { currentWorkspace } = useWorkspaceManagement();
   const { runs, activeRun, isLoading, createRun, generatePlan, approvePlan, executeRun, cancelRun, error, clearError } = useSuperAgent();
   
@@ -75,14 +77,23 @@ export function SuperAgentCommandCenter() {
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="px-8 pt-8 pb-6 border-b border-zinc-800/50">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
-            <Zap size={24} className="text-white" />
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+              <Zap size={24} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white">SI Super Agent</h1>
+              <p className="text-sm text-zinc-500">Turn complex objectives into coordinated intelligent execution</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">SI Super Agent</h1>
-            <p className="text-sm text-zinc-500">Turn complex objectives into coordinated intelligent execution</p>
-          </div>
+          <button
+            onClick={() => navigate('/agents/history')}
+            className="flex items-center gap-2 px-4 py-2 bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 rounded-xl text-sm text-zinc-300 transition-all"
+          >
+            <Clock size={16} />
+            <span>History</span>
+          </button>
         </div>
       </div>
 

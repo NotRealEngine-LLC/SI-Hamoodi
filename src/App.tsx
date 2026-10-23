@@ -14,6 +14,7 @@ import { HubsPage } from './pages/HubsPage';
 import { FilesPage } from './pages/FilesPage';
 import { WorkspaceDashboard } from './pages/WorkspaceDashboard';
 import { SuperAgentCommandCenter } from './pages/SuperAgentCommandCenter';
+import { ExecutionHistoryPage } from './pages/ExecutionHistoryPage';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -114,6 +115,15 @@ function AppRoutes() {
         <ProtectedRoute>
           <AppProviders>
             <SuperAgentCommandCenter />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Execution History */}
+      <Route path="/agents/history" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <ExecutionHistoryPage />
           </AppProviders>
         </ProtectedRoute>
       } />
