@@ -1,11 +1,19 @@
 // HAMOODI SyntheTech Intelligence — Database Types
-// Phase 03: PostgreSQL Schema Types
+// Phase 04: Workspaces, Hubs, Files, Collaboration
 
 export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+
+export type WorkspaceType = 'personal' | 'team';
+export type WorkspaceRole = 'owner' | 'admin' | 'editor' | 'viewer';
+export type HubVisibility = 'workspace' | 'restricted';
+export type HubRole = 'manager' | 'editor' | 'viewer';
+export type FileUploadStatus = 'pending' | 'uploading' | 'ready' | 'failed' | 'deleted';
+export type InvitationRole = 'admin' | 'editor' | 'viewer';
 
 export interface Database {
   public: {
     Tables: {
+      // Phase 03 tables
       profiles: {
         Row: {
           id: string;
@@ -64,31 +72,40 @@ export interface Database {
         Row: {
           id: string;
           owner_id: string;
+          workspace_id: string | null;
+          hub_id: string | null;
           name: string;
           description: string | null;
           icon: string | null;
           color: string | null;
           is_pinned: boolean;
+          archived_at: string | null;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
           owner_id: string;
+          workspace_id?: string | null;
+          hub_id?: string | null;
           name: string;
           description?: string | null;
           icon?: string | null;
           color?: string | null;
           is_pinned?: boolean;
+          archived_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
+          workspace_id?: string | null;
+          hub_id?: string | null;
           name?: string;
           description?: string | null;
           icon?: string | null;
           color?: string | null;
           is_pinned?: boolean;
+          archived_at?: string | null;
           updated_at?: string;
         };
       };
@@ -207,6 +224,247 @@ export interface Database {
         Update: {
           status?: 'pending' | 'completed' | 'failed';
           completed_at?: string | null;
+        };
+      };
+
+      // Phase 04 tables
+      workspaces: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          type: WorkspaceType;
+          owner_id: string;
+          icon: string | null;
+          color: string | null;
+          archived_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          type?: WorkspaceType;
+          owner_id: string;
+          icon?: string | null;
+          color?: string | null;
+          archived_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          name?: string;
+          description?: string | null;
+          icon?: string | null;
+          color?: string | null;
+          archived_at?: string | null;
+          updated_at?: string;
+        };
+      };
+      workspace_members: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          user_id: string;
+          role: WorkspaceRole;
+          joined_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          user_id: string;
+          role?: WorkspaceRole;
+          joined_at?: string;
+          created_at?: string;
+        };
+        Update: {
+          role?: WorkspaceRole;
+        };
+      };
+      hubs: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          name: string;
+          description: string | null;
+          icon: string | null;
+          color: string | null;
+          visibility: HubVisibility;
+          created_by: string;
+          archived_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          name: string;
+          description?: string | null;
+          icon?: string | null;
+          color?: string | null;
+          visibility?: HubVisibility;
+          created_by: string;
+          archived_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          name?: string;
+          description?: string | null;
+          icon?: string | null;
+          color?: string | null;
+          visibility?: HubVisibility;
+          archived_at?: string | null;
+          updated_at?: string;
+        };
+      };
+      hub_members: {
+        Row: {
+          id: string;
+          hub_id: string;
+          user_id: string;
+          role: HubRole;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          hub_id: string;
+          user_id: string;
+          role?: HubRole;
+          created_at?: string;
+        };
+        Update: {
+          role?: HubRole;
+        };
+      };
+      hub_instructions: {
+        Row: {
+          id: string;
+          hub_id: string;
+          content: string;
+          version: number;
+          updated_by: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          hub_id: string;
+          content: string;
+          version?: number;
+          updated_by: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          content?: string;
+          version?: number;
+          updated_at?: string;
+        };
+      };
+      file_folders: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          hub_id: string | null;
+          project_id: string | null;
+          parent_folder_id: string | null;
+          name: string;
+          created_by: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          hub_id?: string | null;
+          project_id?: string | null;
+          parent_folder_id?: string | null;
+          name: string;
+          created_by: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          name?: string;
+          parent_folder_id?: string | null;
+          updated_at?: string;
+        };
+      };
+      workspace_files: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          hub_id: string | null;
+          project_id: string | null;
+          folder_id: string | null;
+          uploaded_by: string;
+          display_name: string;
+          original_name: string;
+          storage_bucket: string;
+          storage_path: string;
+          mime_type: string;
+          size_bytes: number;
+          upload_status: FileUploadStatus;
+          checksum: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          hub_id?: string | null;
+          project_id?: string | null;
+          folder_id?: string | null;
+          uploaded_by: string;
+          display_name: string;
+          original_name: string;
+          storage_bucket: string;
+          storage_path: string;
+          mime_type: string;
+          size_bytes: number;
+          upload_status?: FileUploadStatus;
+          checksum?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          display_name?: string;
+          folder_id?: string | null;
+          upload_status?: FileUploadStatus;
+          updated_at?: string;
+        };
+      };
+      workspace_invitations: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          invited_email: string;
+          invited_role: InvitationRole;
+          token_hash: string;
+          invited_by: string;
+          expires_at: string;
+          accepted_at: string | null;
+          revoked_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          invited_email: string;
+          invited_role?: InvitationRole;
+          token_hash: string;
+          invited_by: string;
+          expires_at: string;
+          accepted_at?: string | null;
+          revoked_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          accepted_at?: string | null;
+          revoked_at?: string | null;
         };
       };
     };

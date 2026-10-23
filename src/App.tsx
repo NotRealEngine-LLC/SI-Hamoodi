@@ -1,11 +1,15 @@
 // HAMOODI SyntheTech Intelligence — Application Entry
-// Phase 03: Secure Authentication & Cloud Database
+// Phase 04: Workspaces, Hubs, Files, Collaboration
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
+import { WorkspaceManagementProvider } from './contexts/WorkspaceManagementContext';
+import { FileProvider } from './contexts/FileContext';
 import { SignInPage, SignUpPage, ForgotPasswordPage, UpdatePasswordPage, AuthCallbackPage, OnboardingPage } from './pages/AuthPages';
 import { WorkspacePage } from './pages/WorkspacePage';
+import { HubsPage } from './pages/HubsPage';
+import { FilesPage } from './pages/FilesPage';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -52,16 +56,48 @@ function AppRoutes() {
       <Route path="/onboarding" element={
         <ProtectedRoute>
           <WorkspaceProvider>
-            <OnboardingPage />
+            <WorkspaceManagementProvider>
+              <OnboardingPage />
+            </WorkspaceManagementProvider>
           </WorkspaceProvider>
         </ProtectedRoute>
       } />
 
-      {/* Workspace */}
+      {/* Workspace — main app with all providers */}
       <Route path="/workspace" element={
         <ProtectedRoute>
           <WorkspaceProvider>
-            <WorkspacePage />
+            <WorkspaceManagementProvider>
+              <FileProvider>
+                <WorkspacePage />
+              </FileProvider>
+            </WorkspaceManagementProvider>
+          </WorkspaceProvider>
+        </ProtectedRoute>
+      } />
+
+      {/* Hubs */}
+      <Route path="/hubs" element={
+        <ProtectedRoute>
+          <WorkspaceProvider>
+            <WorkspaceManagementProvider>
+              <FileProvider>
+                <WorkspacePage />
+              </FileProvider>
+            </WorkspaceManagementProvider>
+          </WorkspaceProvider>
+        </ProtectedRoute>
+      } />
+
+      {/* Files */}
+      <Route path="/files" element={
+        <ProtectedRoute>
+          <WorkspaceProvider>
+            <WorkspaceManagementProvider>
+              <FileProvider>
+                <WorkspacePage />
+              </FileProvider>
+            </WorkspaceManagementProvider>
           </WorkspaceProvider>
         </ProtectedRoute>
       } />

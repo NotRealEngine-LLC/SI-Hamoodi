@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace, Project, Conversation, Message } from '../contexts/WorkspaceContext';
+import { HubsPage } from './HubsPage';
+import { FilesPage } from './FilesPage';
 
 // ============ SIDEBAR ============
 function Sidebar({ activeView, setActiveView, selectedProject, setSelectedProject, selectedConversation, setSelectedConversation }: {
@@ -79,6 +81,20 @@ function Sidebar({ activeView, setActiveView, selectedProject, setSelectedProjec
           <MessageSquare size={16} />
           <span>Conversations</span>
           <span className="ml-auto text-xs text-zinc-600">{conversations.length}</span>
+        </button>
+        <button
+          onClick={() => setActiveView('hubs')}
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${activeView === 'hubs' ? 'bg-violet-500/10 text-violet-300' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'}`}
+        >
+          <Zap size={16} />
+          <span>Hubs</span>
+        </button>
+        <button
+          onClick={() => setActiveView('files')}
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${activeView === 'files' ? 'bg-violet-500/10 text-violet-300' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'}`}
+        >
+          <HardDrive size={16} />
+          <span>Files</span>
         </button>
         <button
           onClick={() => setActiveView('activity')}
@@ -971,14 +987,20 @@ export function WorkspacePage() {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <MainContent
-          activeView={activeView}
-          setActiveView={setActiveView}
-          selectedProject={selectedProject}
-          setSelectedProject={setSelectedProject}
-          selectedConversation={selectedConversation}
-          setSelectedConversation={setSelectedConversation}
-        />
+        {activeView === 'hubs' ? (
+          <HubsPage />
+        ) : activeView === 'files' ? (
+          <FilesPage />
+        ) : (
+          <MainContent
+            activeView={activeView}
+            setActiveView={setActiveView}
+            selectedProject={selectedProject}
+            setSelectedProject={setSelectedProject}
+            selectedConversation={selectedConversation}
+            setSelectedConversation={setSelectedConversation}
+          />
+        )}
       </div>
     </div>
   );

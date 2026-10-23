@@ -5,47 +5,40 @@ Founded by BhaiSazzaD
 
 ---
 
-## Phase 03: Secure Authentication & Cloud Database
+## Phase 04: Advanced Workspaces, Hubs & Cloud File Management
 
-This phase implements the secure identity and persistence infrastructure for HAMOODI SI, transforming the application into a cloud-connected platform with real user accounts and persistent data.
+This phase transforms HAMOODI SI into a multi-tenant, organized intelligence operating environment with workspaces, hubs, file management, and collaboration infrastructure.
 
-### Features Implemented
+### Features
 
-#### Authentication
-- ✅ Email/password sign up and sign in
-- ✅ Email verification flow
-- ✅ Password recovery (forgot/reset)
-- ✅ Secure session management with token refresh
-- ✅ Google OAuth support (when configured)
-- ✅ Authentication state management (guest/authenticated)
+#### Workspace System
+- Personal and team workspaces
+- Workspace switcher with premium UI
+- Role-based access control (owner/admin/editor/viewer)
+- Automatic personal workspace creation
+- Safe migration from Phase 03
+
+#### Hub System
+- Contextual project organization
+- Hub visibility modes (workspace-wide vs restricted)
+- Hub membership and access control
+- Custom instructions for AI context
+- Hub dashboard with project/file counts
+
+#### File Management
+- Cloud file storage via Supabase Storage
+- Drag-and-drop file upload
+- File browsing with grid/list views
+- Folder organization
+- File search and filtering
+- Secure signed URLs for private files
+- 25 MB file size limit
 
 #### Database
-- ✅ PostgreSQL schema with proper relationships
-- ✅ Row Level Security on all tables
-- ✅ Cross-user data isolation via ownership constraints
-- ✅ Database migrations (reproducible)
-- ✅ Typed database integration
-
-#### Workspace
-- ✅ Local guest mode (data stored in browser)
-- ✅ Cloud workspace mode (Supabase-backed)
-- ✅ Projects CRUD with cloud persistence
-- ✅ Conversations with messages
-- ✅ Activity tracking
-- ✅ User preferences (synced across devices)
-
-#### Data Migration
-- ✅ Local-to-cloud import wizard
-- ✅ ID mapping for relationship preservation
-- ✅ Idempotent import with fingerprinting
-- ✅ Partial failure handling
-
-#### Security
-- ✅ RLS policies prevent cross-user data access
-- ✅ No hardcoded credentials
-- ✅ Service role keys never exposed to browser
-- ✅ CHECK constraints prevent invalid ownership
-- ✅ Secure redirect handling
+- 8 new tables with Row Level Security
+- Extended projects table with workspace/hub relationships
+- Proper indexes and constraints
+- Safe migration for existing data
 
 ### Setup Instructions
 
@@ -62,7 +55,7 @@ This phase implements the secure identity and persistence infrastructure for HAM
 
 3. **Configure Supabase**
    - Create a project at [supabase.com](https://supabase.com)
-   - Copy your project URL and anon/publishable key
+   - Copy your project URL and anon key
    - Create `.env.local`:
    ```env
    VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -72,19 +65,26 @@ This phase implements the secure identity and persistence infrastructure for HAM
 
 4. **Run database migrations**
    - Open the Supabase SQL Editor
-   - Run the contents of `supabase/migrations/001_initial_schema.sql`
+   - Run `supabase/migrations/001_initial_schema.sql` (Phase 03)
+   - Run `supabase/migrations/002_workspaces_hubs_files.sql` (Phase 04)
    - Or use Supabase CLI:
    ```bash
    npx supabase db push
    ```
 
-5. **Configure Auth Providers (optional)**
-   - In Supabase Dashboard → Authentication → Providers
+5. **Configure Storage**
+   - In Supabase Dashboard → Storage
+   - Create a new bucket named `si-workspace-files`
+   - Set it to **private**
+   - Configure file size limits (recommended: 25 MB)
+   - Add storage policies for authenticated users
+
+6. **Configure Auth Providers (optional)**
    - Enable Email provider (enabled by default)
    - Configure Google OAuth if desired
    - Set redirect URLs to include `http://localhost:3000/auth/callback`
 
-6. **Start development**
+7. **Start development**
    ```bash
    npm run dev
    ```
@@ -93,66 +93,81 @@ This phase implements the secure identity and persistence infrastructure for HAM
 
 ```
 src/
-├── App.tsx                    # Application router
-├── main.tsx                   # Entry point
-├── index.css                  # Global styles
-├── vite-env.d.ts             # Vite type declarations
 ├── contexts/
-│   ├── AuthContext.tsx        # Authentication state & actions
-│   └── WorkspaceContext.tsx   # Data management (local/cloud)
-├── lib/
-│   └── supabase/
-│       ├── client.ts          # Supabase client instance
-│       ├── config.ts          # Configuration & validation
-│       └── types.ts           # Database TypeScript types
-└── pages/
-    ├── AuthPages.tsx          # Sign in, sign up, forgot password
-    └── WorkspacePage.tsx      # Main workspace UI
+│   ├── AuthContext.tsx                    # Authentication
+│   ├── WorkspaceContext.tsx               # Local/Cloud data
+│   ├── WorkspaceManagementContext.tsx     # Workspaces & Hubs
+│   └── FileContext.tsx                    # File management
+├── components/
+│   ├── CloudStatus.tsx                    # Sync indicator
+│   └── WorkspaceSwitcher.tsx              # Workspace selection
+├── pages/
+│   ├── AuthPages.tsx                      # Auth UI
+│   ├── WorkspacePage.tsx                  # Main workspace
+│   ├── HubsPage.tsx                       # Hub management
+│   └── FilesPage.tsx                      # File browser
+└── lib/
+    ├── supabase/
+    │   ├── client.ts
+    │   ├── config.ts
+    │   └── types.ts
+    └── puter/
+        └── ai.ts
 ```
 
 ### Database Schema
 
-| Table | Purpose |
-|-------|---------|
-| `profiles` | User display name, avatar |
-| `user_preferences` | Theme, motion, view settings |
-| `projects` | User projects with metadata |
-| `conversations` | AI conversations, optionally linked to projects |
-| `messages` | Individual messages within conversations |
-| `activity_events` | Workspace activity history |
-| `local_import_batches` | Track local-to-cloud migrations |
+#### Core Tables
+- `profiles` — User display information
+- `user_preferences` — Synced workspace settings
+- `workspaces` — Top-level organizational containers
+- `workspace_members` — User membership with roles
+- `hubs` — Contextual project groupings
+- `hub_members` — Hub-specific access control
+- `hub_instructions` — AI context instructions
+- `projects` — Work units (extended with workspace_id, hub_id)
+- `conversations` — AI conversation threads
+- `messages` — Individual messages
+- `file_folders` — Virtual folder organization
+- `workspace_files` — File metadata
+- `workspace_invitations` — Collaboration invitations
+- `activity_events` — Workspace activity history
 
 ### Security Model
 
-- **Row Level Security** enabled on all tables
-- **Ownership predicates** ensure users can only access their own data
-- **CHECK constraints** prevent invalid cross-user relationships
-- **No SECURITY DEFINER functions** used
-- **Publishable key** safe for browser exposure
-- **Service role key** never used in client code
+- **Row Level Security** on all tables
+- **Role-based access** (owner/admin/editor/viewer)
+- **Workspace membership** verified at database level
+- **Private file storage** with signed URLs
+- **No cross-tenant data access**
+- **CHECK constraints** prevent invalid relationships
 
 ### Workspace Modes
 
-| Mode | Data Storage | Features |
-|------|-------------|----------|
-| **Local Guest** | Browser localStorage | Projects, conversations, preferences |
-| **Cloud** | Supabase PostgreSQL | All local features + cross-device sync |
+| Mode | Description |
+|------|-------------|
+| **Local Guest** | Browser localStorage, no account required |
+| **Cloud Personal** | Single-user cloud workspace |
+| **Cloud Team** | Multi-user collaborative workspace |
 
-### HAMOODI vs Puter Authentication
+### File Management
 
-These are separate systems:
-- **HAMOODI Account** (Supabase): User identity, cloud data, workspace
-- **AI Provider** (Puter.js): AI generation authorization
+#### Upload Limits
+- Maximum file size: 25 MB
+- Supported types: PDF, TXT, MD, CSV, DOCX, XLSX, PNG, JPG, WEBP, JSON, and more
 
-They are displayed independently in settings.
-
-### Building for Production
-
-```bash
-npm run build
+#### Storage Structure
+```
+si-workspace-files/
+└── workspaces/{workspaceId}/
+    └── objects/{fileId}/
+        └── {filename}
 ```
 
-Output is in `dist/` directory.
+#### Security
+- Private bucket (no public access)
+- Signed URLs with 1-hour expiration
+- Access verified through workspace membership
 
 ### Environment Variables
 
@@ -162,9 +177,43 @@ Output is in `dist/` directory.
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Yes (for cloud) | Anon/publishable key |
 | `VITE_APP_URL` | No | Application URL for callbacks |
 
-Without Supabase credentials, the app runs in local guest mode.
+### Building for Production
+
+```bash
+npm run build
+```
+
+Output is in `dist/` directory.
+
+### Documentation
+
+- [Phase 03 Handoff](docs/part-03-handoff.md) — Authentication & Cloud Database
+- [Phase 04 Handoff](docs/part-04-handoff.md) — Workspaces, Hubs & Files
+- [Database Schema](docs/database-schema.md) — Complete schema documentation
+- [Auth Architecture](docs/auth-architecture.md) — Authentication system
+- [RLS Security](docs/rls-security.md) — Row Level Security policies
+- [Migration Strategy](docs/migration-strategy.md) — Local-to-cloud migration
+
+### Known Limitations
+
+1. Hub instructions not yet integrated with AI context
+2. File preview limited for PDF/Office documents
+3. Invitation email delivery not configured
+4. Cross-workspace project moves not supported
+5. Real-time collaboration not implemented
+6. Advanced semantic search not implemented
+
+### Next Phase (05)
+
+Phase 05 will focus on:
+- AI context integration with Hub instructions
+- Advanced file preview and editing
+- Invitation email delivery
+- Real-time collaboration
+- Workspace analytics
 
 ---
 
-**HAMOODI SyntheTech Intelligence** — Phase 03 / 12  
-*Building the future of unified intelligence*
+**HAMOODI SyntheTech Intelligence** — Phase 04 / 12  
+*Advanced Workspaces • Intelligent Hubs • Cloud File Management*  
+*Founded by BhaiSazzaD*
