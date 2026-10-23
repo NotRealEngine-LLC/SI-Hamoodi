@@ -30,6 +30,9 @@ import { SheetsStudio } from './pages/SheetsStudio';
 import { SlidesStudio } from './pages/SlidesStudio';
 import { CreativeStudio } from './pages/CreativeStudio';
 import { DeveloperStudio } from './pages/DeveloperStudio';
+import { AgentsHub } from './pages/AgentsHub';
+import { AgentBuilder } from './pages/AgentBuilder';
+import { AgentsProvider } from './contexts/AgentsContext';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -72,7 +75,9 @@ function AppProviders({ children }: { children: React.ReactNode }) {
             <SuperAgentProvider>
               <MemoryProvider>
                 <IntegrationsProvider>
-                  {children}
+                  <AgentsProvider>
+                    {children}
+                  </AgentsProvider>
                 </IntegrationsProvider>
               </MemoryProvider>
             </SuperAgentProvider>
@@ -292,6 +297,29 @@ function AppRoutes() {
         <ProtectedRoute>
           <AppProviders>
             <DeveloperStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Agents & Automation */}
+      <Route path="/agents" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AgentsHub />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/agents/builder" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AgentBuilder />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/agents/custom/:id" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AgentBuilder />
           </AppProviders>
         </ProtectedRoute>
       } />
