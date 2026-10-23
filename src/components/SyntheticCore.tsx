@@ -64,26 +64,33 @@ export function SyntheticCore({ className = '', interactive = true }: SyntheticC
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Core nucleus
-    const nucleusGeometry = new THREE.IcosahedronGeometry(0.8, 2);
-    const nucleusMaterial = new THREE.MeshPhongMaterial({
+    // Core nucleus - enhanced with better materials
+    const nucleusGeometry = new THREE.IcosahedronGeometry(0.8, 3);
+    const nucleusMaterial = new THREE.MeshPhysicalMaterial({
       color: 0x9378ff,
       emissive: 0x9378ff,
-      emissiveIntensity: 0.3,
-      shininess: 100,
+      emissiveIntensity: 0.4,
+      metalness: 0.3,
+      roughness: 0.2,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.1,
       transparent: true,
-      opacity: 0.9,
+      opacity: 0.95,
     });
     const nucleus = new THREE.Mesh(nucleusGeometry, nucleusMaterial);
     scene.add(nucleus);
 
-    // Inner geometric mesh
-    const innerGeometry = new THREE.OctahedronGeometry(0.6, 0);
-    const innerMaterial = new THREE.MeshBasicMaterial({
+    // Inner geometric mesh - refined
+    const innerGeometry = new THREE.OctahedronGeometry(0.6, 1);
+    const innerMaterial = new THREE.MeshPhysicalMaterial({
       color: 0x52dad5,
+      emissive: 0x52dad5,
+      emissiveIntensity: 0.2,
       wireframe: true,
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.5,
+      metalness: 0.5,
+      roughness: 0.3,
     });
     const innerMesh = new THREE.Mesh(innerGeometry, innerMaterial);
     scene.add(innerMesh);

@@ -25,6 +25,8 @@ interface SidebarProps {
   onNavigate: (route: string) => void;
   isDark: boolean;
   onToggleTheme: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
   user?: { name: string; email: string } | null;
   onSignOut?: () => void;
 }
@@ -41,11 +43,13 @@ export function EnhancedSidebar({
   onNavigate, 
   isDark, 
   onToggleTheme,
+  isCollapsed = false,
+  onToggleCollapse,
   user,
   onSignOut 
 }: SidebarProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const isExpanded = !isCollapsed;
 
   const primaryNav: NavItem[] = [
     { icon: Home, label: 'Home', route: '/' },
@@ -137,13 +141,15 @@ export function EnhancedSidebar({
         </div>
 
         {/* Collapse toggle */}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="hidden lg:flex items-center justify-center p-2 mx-2 mt-2 rounded-lg hover:bg-[var(--si-surface-interactive)] transition-colors"
-          aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
-        >
-          {isExpanded ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-        </button>
+        {onToggleCollapse && (
+          <button
+            onClick={onToggleCollapse}
+            className="hidden lg:flex items-center justify-center p-2 mx-2 mt-2 rounded-lg hover:bg-[var(--si-surface-interactive)] transition-colors"
+            aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
+          >
+            {isExpanded ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+          </button>
+        )}
 
         {/* Primary navigation */}
         <nav className="flex-1 overflow-y-auto p-2 space-y-1">

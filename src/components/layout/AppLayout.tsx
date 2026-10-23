@@ -6,6 +6,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { EnhancedSidebar } from '../navigation/EnhancedSidebar';
 import { EnhancedHeader } from '../navigation/EnhancedHeader';
+import { GlobalSearch } from '../search/GlobalSearch';
+import { CommandPalette } from '../search/CommandPalette';
+import { useKeyboardShortcuts, registerDefaultShortcuts } from '../../lib/keyboard/shortcuts';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -16,6 +19,12 @@ export function AppLayout({ children }: AppLayoutProps) {
   const location = useLocation();
   const { user, state: authState, signOut } = useAuth();
   const [isDark, setIsDark] = useState(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // Initialize keyboard shortcuts
+  useKeyboardShortcuts();
 
   // Initialize theme from localStorage or system preference
   useEffect(() => {
@@ -27,6 +36,20 @@ export function AppLayout({ children }: AppLayoutProps) {
       setIsDark(prefersDark);
     }
   }, []);
+
+  // Register default keyboard shortcuts
+  useEffect(() => {
+    registerDefaultShortcuts({
+      openCommandPalette: () => setIsCommandPaletteOpen(true),
+      newChat: () => navigate('/chat'),
+      toggleSidebar: () => setIsSidebarCollapsed(!isSidebarCollapsed),
+      focusSearch: () => setIsSearchOpen(true),
+      closeOverlay: () => {
+        setIsCommandPaletteOpen(false);
+        setIsSearchOpen(false);
+      },
+    });
+  }, [navigate, isSidebarCollapsed]);
 
   // Apply theme to document
   useEffect(() => {
@@ -52,13 +75,11 @@ export function AppLayout({ children }: AppLayoutProps) {
   };
 
   const handleSearch = () => {
-    // TODO: Implement global search
-    console.log('Search triggered');
+    setIsSearchOpen(true);
   };
 
   const handleCommandPalette = () => {
-    // TODO: Implement command palette
-    console.log('Command palette triggered');
+    setIsCommandPaletteOpen(true);
   };
 
   const handleSettings = () => {
@@ -137,6 +158,8 @@ export function AppLayout({ children }: AppLayoutProps) {
         onNavigate={handleNavigate}
         isDark={isDark}
         onToggleTheme={handleToggleTheme}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         user={user ? { name: user.email?.split('@')[0] || 'User', email: user.email || '' } : null}
         onSignOut={handleSignOut}
       />
@@ -163,6 +186,17 @@ export function AppLayout({ children }: AppLayoutProps) {
           {children}
         </main>
       </div>
+
+      {/* Global Search Modal */}
+      <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+
+      {/* Command Palette */}
+      <CommandPalette 
+        isOpen={isCommandPaletteOpen} 
+        onClose={() => setIsCommandPaletteOpen(false)}
+        isDark={isDark}
+        onToggleTheme={handleToggleTheme}
+      />
     </div>
   );
 }
