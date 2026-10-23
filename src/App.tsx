@@ -17,6 +17,8 @@ import { WorkspaceDashboard } from './pages/WorkspaceDashboard';
 import { SuperAgentCommandCenter } from './pages/SuperAgentCommandCenter';
 import { ExecutionHistoryPage } from './pages/ExecutionHistoryPage';
 import { MemoryManagementPage, SecondBrainDashboard } from './pages/MemoryPages';
+import { KnowledgeSearchUI } from './components/KnowledgeSearchUI';
+import { KnowledgeSettingsPage } from './pages/KnowledgeSettingsPage';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -146,6 +148,24 @@ function AppRoutes() {
         <ProtectedRoute>
           <AppProviders>
             <SecondBrainDashboard />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Knowledge Search */}
+      <Route path="/knowledge/search" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <KnowledgeSearchUI />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Knowledge Settings */}
+      <Route path="/knowledge/settings" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <KnowledgeSettingsPage />
           </AppProviders>
         </ProtectedRoute>
       } />
