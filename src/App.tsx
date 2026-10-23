@@ -40,6 +40,11 @@ import { PricingPage } from './pages/PricingPage';
 import { BillingDashboard } from './pages/BillingDashboard';
 import { AnalyticsDashboard } from './pages/AnalyticsDashboard';
 import { HomePage } from './pages/HomePage';
+import { ProjectsPage } from './pages/ProjectsPage';
+import { ActivityPage } from './pages/ActivityPage';
+import { ToolsPage } from './pages/ToolsPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { AboutPage } from './pages/AboutPage';
 import { EnhancedSidebar } from './components/navigation/EnhancedSidebar';
 import { EnhancedHeader } from './components/navigation/EnhancedHeader';
 import { AppLayout } from './components/layout/AppLayout';
@@ -137,6 +142,61 @@ function AppRoutes() {
           <AppProviders>
             <AppLayout>
               <WorkspacePage />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Projects */}
+      <Route path="/projects" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <ProjectsPage />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Activity */}
+      <Route path="/activity" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <ActivityPage />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Tools Directory */}
+      <Route path="/tools" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <ToolsPage />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Settings */}
+      <Route path="/settings" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <SettingsPage />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* About */}
+      <Route path="/about" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <AboutPage />
             </AppLayout>
           </AppProviders>
         </ProtectedRoute>
