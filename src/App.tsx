@@ -1,0 +1,478 @@
+// HAMOODI SyntheTech Intelligence — Application Entry
+// Part 01 & 02: Foundation Engineering & Premium UI/UX
+// Phases 03-12: Complete Platform Implementation
+
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { WorkspaceProvider } from './contexts/WorkspaceContext';
+import { WorkspaceManagementProvider } from './contexts/WorkspaceManagementContext';
+import { FileProvider } from './contexts/FileContext';
+import { IntelligenceProvider } from './contexts/IntelligenceContext';
+import { SuperAgentProvider } from './contexts/SuperAgentContext';
+import { MemoryProvider } from './contexts/MemoryContext';
+import { SignInPage, SignUpPage, ForgotPasswordPage, UpdatePasswordPage, AuthCallbackPage, OnboardingPage } from './pages/AuthPages';
+import { WorkspacePage } from './pages/WorkspacePage';
+import { HubsPage } from './pages/HubsPage';
+import { FilesPage } from './pages/FilesPage';
+import { WorkspaceDashboard } from './pages/WorkspaceDashboard';
+import { SuperAgentCommandCenter } from './pages/SuperAgentCommandCenter';
+import { ExecutionHistoryPage } from './pages/ExecutionHistoryPage';
+import { MemoryManagementPage, SecondBrainDashboard } from './pages/MemoryPages';
+import { KnowledgeSearchUI } from './components/KnowledgeSearchUI';
+import { KnowledgeSettingsPage } from './pages/KnowledgeSettingsPage';
+import { IntegrationsHub } from './pages/IntegrationsHub';
+import { IntegrationsProvider } from './contexts/IntegrationsContext';
+import { OAuthCallbackHandler } from './pages/OAuthCallbackHandler';
+import { ToolExplorer } from './pages/ToolExplorer';
+import { StudiosHub } from './pages/StudiosHub';
+import { ResearchStudio } from './pages/ResearchStudio';
+import { DocsStudio } from './pages/DocsStudio';
+import { SheetsStudio } from './pages/SheetsStudio';
+import { SlidesStudio } from './pages/SlidesStudio';
+import { CreativeStudio } from './pages/CreativeStudio';
+import { DeveloperStudio } from './pages/DeveloperStudio';
+import { AgentsHub } from './pages/AgentsHub';
+import { AgentBuilder } from './pages/AgentBuilder';
+import { SkillStudio } from './pages/SkillStudio';
+import { WorkflowBuilder } from './pages/WorkflowBuilder';
+import { AgentsProvider } from './contexts/AgentsContext';
+import { PricingPage } from './pages/PricingPage';
+import { BillingDashboard } from './pages/BillingDashboard';
+import { AnalyticsDashboard } from './pages/AnalyticsDashboard';
+import { HomePage } from './pages/HomePage';
+import { ProjectsPage } from './pages/ProjectsPage';
+import { ActivityPage } from './pages/ActivityPage';
+import { ToolsPage } from './pages/ToolsPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { AboutPage } from './pages/AboutPage';
+import { EnhancedSidebar } from './components/navigation/EnhancedSidebar';
+import { EnhancedHeader } from './components/navigation/EnhancedHeader';
+import { AppLayout } from './components/layout/AppLayout';
+import { useState, useEffect } from 'react';
+
+// Protected route wrapper
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { state } = useAuth();
+  
+  if (state === 'initializing') {
+    return (
+      <div className="h-screen flex items-center justify-center bg-zinc-950">
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <span className="text-lg font-bold text-white">⬡</span>
+          </div>
+          <p className="text-sm text-zinc-500">Initializing HAMOODI...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
+
+// Auth redirect - if already authenticated, go to workspace
+function AuthRedirect({ children }: { children: React.ReactNode }) {
+  const { state } = useAuth();
+  
+  if (state === 'authenticated') {
+    return <Navigate to="/workspace" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// All providers wrapper
+function AppProviders({ children }: { children: React.ReactNode }) {
+  return (
+    <WorkspaceProvider>
+      <WorkspaceManagementProvider>
+        <FileProvider>
+          <IntelligenceProvider>
+            <SuperAgentProvider>
+              <MemoryProvider>
+                <IntegrationsProvider>
+                  <AgentsProvider>
+                    {children}
+                  </AgentsProvider>
+                </IntegrationsProvider>
+              </MemoryProvider>
+            </SuperAgentProvider>
+          </IntelligenceProvider>
+        </FileProvider>
+      </WorkspaceManagementProvider>
+    </WorkspaceProvider>
+  );
+}
+
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Auth routes */}
+      <Route path="/auth/sign-in" element={<AuthRedirect><SignInPage /></AuthRedirect>} />
+      <Route path="/auth/sign-up" element={<AuthRedirect><SignUpPage /></AuthRedirect>} />
+      <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/auth/update-password" element={<UpdatePasswordPage />} />
+      <Route path="/auth/callback" element={<AuthCallbackPage />} />
+      
+      {/* Homepage - Part 01 Premium SI Command Center */}
+      <Route path="/" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <HomePage onNavigate={(route) => window.location.href = route} />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Onboarding */}
+      <Route path="/onboarding" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <OnboardingPage />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Workspace dashboard */}
+      <Route path="/workspace" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <WorkspacePage />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Projects */}
+      <Route path="/projects" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <ProjectsPage />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Activity */}
+      <Route path="/activity" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <ActivityPage />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Tools Directory */}
+      <Route path="/tools" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <ToolsPage />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Settings */}
+      <Route path="/settings" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <SettingsPage />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* About */}
+      <Route path="/about" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <AboutPage />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Hubs */}
+      <Route path="/hubs" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <WorkspacePage />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Files */}
+      <Route path="/files" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <WorkspacePage />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Super Agent */}
+      <Route path="/agents" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SuperAgentCommandCenter />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Execution History */}
+      <Route path="/agents/history" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <ExecutionHistoryPage />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Memory Management */}
+      <Route path="/memory" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <MemoryManagementPage />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* SecondBrain Dashboard */}
+      <Route path="/secondbrain" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SecondBrainDashboard />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Knowledge Search */}
+      <Route path="/knowledge/search" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <KnowledgeSearchUI />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Knowledge Settings */}
+      <Route path="/knowledge/settings" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <KnowledgeSettingsPage />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Integrations */}
+      <Route path="/integrations" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <IntegrationsHub />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Tool Explorer */}
+      <Route path="/integrations/tools" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <ToolExplorer />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* OAuth Callback */}
+      <Route path="/integrations/oauth/callback" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <OAuthCallbackHandler />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Studios */}
+      <Route path="/studios" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <StudiosHub />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/research" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <ResearchStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/docs" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <DocsStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/docs/:id" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <DocsStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/sheets" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SheetsStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/sheets/:id" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SheetsStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/slides" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SlidesStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/slides/:id" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SlidesStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/creative" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <CreativeStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/creative/:id" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <CreativeStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/code" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <DeveloperStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/code/:id" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <DeveloperStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Agents & Automation */}
+      <Route path="/agents" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AgentsHub />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/agents/builder" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AgentBuilder />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/agents/custom/:id" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AgentBuilder />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/skills/new" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SkillStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/skills/:id/edit" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SkillStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/workflows/new" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <WorkflowBuilder />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/workflows/:id/edit" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <WorkflowBuilder />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Billing & Analytics */}
+      <Route path="/pricing" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <PricingPage />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/billing" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <BillingDashboard />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/analytics" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AnalyticsDashboard />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Default redirect */}
+      <Route path="*" element={<Navigate to="/workspace" replace />} />
+    </Routes>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
