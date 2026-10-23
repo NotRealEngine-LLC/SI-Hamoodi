@@ -1,5 +1,5 @@
 // HAMOODI SyntheTech Intelligence — Synthetic Core Visualization
-// Part 01: Three.js Interactive Intelligence Reactor
+// Enhanced with premium Three.js effects and smooth animations
 
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
@@ -18,6 +18,7 @@ export function SyntheticCore({ className = '', interactive = true }: SyntheticC
   const animationFrameRef = useRef<number | null>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
   const targetRotationRef = useRef({ x: 0, y: 0 });
+  const pulseRef = useRef(0);
 
   useEffect(() => {
     if (!containerRef.current) return;
