@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { WorkspaceManagementProvider } from './contexts/WorkspaceManagementContext';
 import { FileProvider } from './contexts/FileContext';
+import { IntelligenceProvider } from './contexts/IntelligenceContext';
 import { SignInPage, SignUpPage, ForgotPasswordPage, UpdatePasswordPage, AuthCallbackPage, OnboardingPage } from './pages/AuthPages';
 import { WorkspacePage } from './pages/WorkspacePage';
 import { HubsPage } from './pages/HubsPage';
@@ -49,7 +50,9 @@ function AppProviders({ children }: { children: React.ReactNode }) {
     <WorkspaceProvider>
       <WorkspaceManagementProvider>
         <FileProvider>
-          {children}
+          <IntelligenceProvider>
+            {children}
+          </IntelligenceProvider>
         </FileProvider>
       </WorkspaceManagementProvider>
     </WorkspaceProvider>

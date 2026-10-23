@@ -8,7 +8,16 @@ declare global {
   interface Window {
     puter?: {
       ai: {
-        chat: (prompt: string | Array<{ role: string; content: string }>, options?: { model?: string; stream?: boolean }) => Promise<string | ReadableStream>;
+        chat: (
+          prompt: string | Array<{ role: string; content: string }>,
+          options?: {
+            model?: string;
+            stream?: boolean;
+            temperature?: number;
+            max_tokens?: number;
+          }
+        ) => Promise<string | ReadableStream | AsyncIterable<any>>;
+        listModels?: () => Promise<any[]>;
       };
       auth: {
         isSignedIn: () => Promise<boolean>;
