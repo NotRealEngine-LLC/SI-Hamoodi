@@ -12,10 +12,13 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace, Project, Conversation, Message } from '../contexts/WorkspaceContext';
+import { useIntelligence } from '../contexts/IntelligenceContext';
 import { HubsPage } from './HubsPage';
 import { FilesPage } from './FilesPage';
 import { WorkspaceDashboard } from './WorkspaceDashboard';
 import { GlobalSearch } from '../components/GlobalSearch';
+import { SIComposer, SIMessage, SIContextIndicator, SIErrorPanel } from '../components/intelligence';
+import type { AIPreset } from '../lib/intelligence/types';
 
 // ============ SIDEBAR ============
 function Sidebar({ activeView, setActiveView, selectedProject, setSelectedProject, selectedConversation, setSelectedConversation }: {
@@ -600,61 +603,45 @@ function ConversationsOverview({ onSelectConversation }: { onSelectConversation:
 // ============ CONVERSATION VIEW ============
 function ConversationView({ conversation, onBack }: { conversation: Conversation; onBack: () => void }) {
   const { addMessage, updateConversation, deleteConversation, mode } = useWorkspace();
-  const [input, setInput] = useState('');
-  const [sending, setSending] = useState(false);
-  const [streamingContent, setStreamingContent] = useState('');
+  const { isGenerating, streamingContent, generate, cancelGeneration, error: aiError } = useIntelligence();
   const [selectedModel, setSelectedModel] = useState(conversation.selected_model_id || 'gpt-4o-mini');
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [conversation.messages, streamingContent]);
 
-  const handleSend = async () => {
-    if (!input.trim() || sending) return;
-    const userMsg = input.trim();
-    setInput('');
-    setSending(true);
-    setStreamingContent('');
+  const handleSend = async (message: string, preset?: AIPreset) => {
+    setError(null);
 
     // Add user message
     await addMessage(conversation.id, {
       role: 'user',
-      content: userMsg,
+      content: message,
       status: 'completed',
       model_id: null,
       conversation_id: conversation.id,
     });
 
     try {
-      // Build conversation history for context
-      const history = conversation.messages
-        .filter(m => m.role === 'user' || m.role === 'assistant')
-        .map(m => ({ role: m.role, content: m.content }));
-
-      // Import and use Puter.js AI
-      const { sendAIRequest, isPuterAvailable } = await import('../lib/puter/ai');
-      
-      const aiResponse = await sendAIRequest(userMsg, {
-        model: selectedModel,
-        conversationHistory: history,
-        onStream: isPuterAvailable() ? (chunk) => setStreamingContent(prev => prev + chunk) : undefined,
-      });
-
-      // Persist assistant response
-      await addMessage(conversation.id, {
-        role: 'assistant',
-        content: aiResponse,
-        status: 'completed',
-        model_id: selectedModel,
-        conversation_id: conversation.id,
-      });
+      // Use intelligence service
+      await generate(
+        {
+          workspaceId: 'default', // TODO: Get from workspace context
+          conversationId: conversation.id,
+        },
+        message,
+        preset
+      );
 
       // Update conversation timestamp
       await updateConversation(conversation.id, { updated_at: new Date().toISOString() } as Partial<Conversation>);
     } catch (err) {
-      // Save error state
       const errorMsg = err instanceof Error ? err.message : 'AI request failed';
+      setError(errorMsg);
+      
+      // Save error state
       await addMessage(conversation.id, {
         role: 'assistant',
         content: `⚠️ Error: ${errorMsg}\n\nYour message was saved. Please try again.`,
@@ -663,9 +650,6 @@ function ConversationView({ conversation, onBack }: { conversation: Conversation
         conversation_id: conversation.id,
       });
     }
-
-    setSending(false);
-    setStreamingContent('');
   };
 
   return (
@@ -701,71 +685,50 @@ function ConversationView({ conversation, onBack }: { conversation: Conversation
           </div>
         )}
         {conversation.messages.map(msg => (
-          <motion.div
+          <SIMessage
             key={msg.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            {msg.role === 'assistant' && (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center shrink-0">
-                <Bot size={14} className="text-violet-400" />
-              </div>
-            )}
-            <div className={`max-w-[70%] px-4 py-3 rounded-2xl text-sm ${
-              msg.role === 'user'
-                ? 'bg-violet-600 text-white rounded-br-md'
-                : 'bg-zinc-800 text-zinc-200 rounded-bl-md border border-zinc-700/50'
-            }`}>
-              <p className="whitespace-pre-wrap">{msg.content}</p>
-              {msg.status === 'streaming' && <span className="inline-block w-2 h-4 bg-zinc-400 animate-pulse ml-1" />}
-            </div>
-            {msg.role === 'user' && (
-              <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center shrink-0">
-                <User size={14} className="text-zinc-300" />
-              </div>
-            )}
-          </motion.div>
+            message={msg}
+            onRegenerate={() => console.log('Regenerate', msg.id)}
+            onEdit={() => console.log('Edit', msg.id)}
+            onBranch={() => console.log('Branch', msg.id)}
+          />
         ))}
         {/* Streaming content display */}
         {streamingContent && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex gap-3 justify-start"
-          >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center shrink-0">
-              <Bot size={14} className="text-violet-400" />
-            </div>
-            <div className="max-w-[70%] px-4 py-3 rounded-2xl text-sm bg-zinc-800 text-zinc-200 rounded-bl-md border border-zinc-700/50">
-              <p className="whitespace-pre-wrap">{streamingContent}</p>
-              <span className="inline-block w-2 h-4 bg-violet-400 animate-pulse ml-1" />
-            </div>
-          </motion.div>
+          <SIMessage
+            message={{
+              id: 'streaming',
+              conversation_id: conversation.id,
+              role: 'assistant',
+              content: streamingContent,
+              status: 'streaming',
+              model_id: selectedModel,
+              created_at: new Date().toISOString(),
+            }}
+            isStreaming
+          />
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="p-4 border-t border-zinc-800/50">
-        <div className="flex gap-2">
-          <input
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
-            placeholder="Type a message..."
-            disabled={sending}
-            className="flex-1 px-4 py-3 bg-zinc-800/50 border border-zinc-700/50 rounded-xl text-white text-sm placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 disabled:opacity-50"
+      {/* Error panel */}
+      {error && (
+        <div className="px-4 pt-4">
+          <SIErrorPanel
+            error={error}
+            retryable
+            onRetry={() => setError(null)}
+            onDismiss={() => setError(null)}
           />
-          <button
-            onClick={handleSend}
-            disabled={!input.trim() || sending}
-            className="px-4 py-3 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white rounded-xl transition-all"
-          >
-            {sending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-          </button>
         </div>
-      </div>
+      )}
+
+      {/* Composer */}
+      <SIComposer
+        onSend={handleSend}
+        onCancel={cancelGeneration}
+        isGenerating={isGenerating}
+      />
     </div>
   );
 }
