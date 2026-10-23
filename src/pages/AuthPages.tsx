@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
-import { isSupabaseConfigured } from '../lib/supabase/config';
 
 // ============ PREMIUM SPLIT LAYOUT ============
 function AuthSplitLayout({ children, title, subtitle }: { children: React.ReactNode; title: string; subtitle?: string }) {

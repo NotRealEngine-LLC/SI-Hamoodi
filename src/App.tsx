@@ -11,8 +11,6 @@ import { WorkspacePage } from './pages/WorkspacePage';
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { state } = useAuth();
   
-  // Allow both authenticated and guest users to access workspace
-  // but show appropriate content based on auth state
   if (state === 'initializing') {
     return (
       <div className="h-screen flex items-center justify-center bg-zinc-950">
@@ -49,7 +47,15 @@ function AppRoutes() {
       <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/auth/update-password" element={<UpdatePasswordPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
-      <Route path="/onboarding" element={<OnboardingPage />} />
+      
+      {/* Onboarding — needs WorkspaceProvider for preferences */}
+      <Route path="/onboarding" element={
+        <ProtectedRoute>
+          <WorkspaceProvider>
+            <OnboardingPage />
+          </WorkspaceProvider>
+        </ProtectedRoute>
+      } />
 
       {/* Workspace */}
       <Route path="/workspace" element={

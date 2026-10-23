@@ -5,9 +5,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FolderOpen, MessageSquare, Plus, Search, Settings, LogOut, User,
+  FolderOpen, MessageSquare, Plus, Settings, LogOut, User,
   Cloud, CloudOff, Pin, Trash2, Edit3, Check, X, Menu, ChevronRight,
-  Sparkles, Send, Bot, Loader2, Zap, Globe, HardDrive, ArrowUpRight,
+  Sparkles, Send, Bot, Loader2, Zap, Globe, HardDrive,
   Shield, RefreshCw, Database, CheckCircle, AlertCircle, Clock
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';

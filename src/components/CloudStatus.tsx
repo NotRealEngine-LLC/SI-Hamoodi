@@ -2,8 +2,8 @@
 // Phase 03: Unified sync state display
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Cloud, CloudOff, RefreshCw, CheckCircle, AlertCircle, HardDrive, Wifi } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Cloud, CloudOff, RefreshCw, CheckCircle, AlertCircle, HardDrive } from 'lucide-react';
 
 export type CloudStatus = 'local' | 'connecting' | 'connected' | 'saving' | 'saved' | 'offline' | 'error';
 

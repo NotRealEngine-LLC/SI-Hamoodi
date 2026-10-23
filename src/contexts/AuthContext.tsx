@@ -2,7 +2,7 @@
 // Phase 03: Secure Authentication & Session Management
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { User, Session, AuthError } from '@supabase/supabase-js';
+import type { User, Session, AuthError } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabase/client';
 import { isSupabaseConfigured } from '../lib/supabase/config';
 
@@ -42,18 +42,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const configured = isSupabaseConfigured();
 
-  const fetchProfile = useCallback(async (userId: string) => {
+  const fetchProfile = useCallback(async (userId: string): Promise<Profile | null> => {
     const supabase = getSupabaseClient();
     if (!supabase) return null;
 
-    const { data, error } = await supabase
+    const result = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
 
-    if (error || !data) return null;
-    return data as Profile;
+    if (result.error || !result.data) return null;
+    return result.data as Profile;
   }, []);
 
   const ensureProfile = useCallback(async (userId: string, email: string) => {
@@ -61,20 +61,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!supabase) return;
 
     // Try to get existing profile
-    const { data: existing } = await supabase
+    const existingResult = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
 
-    if (existing) {
-      setProfile(existing as Profile);
+    if (existingResult.data) {
+      setProfile(existingResult.data as Profile);
       return;
     }
 
     // Create profile on first login
     const displayName = email.split('@')[0];
-    const { data: newProfile, error } = await supabase
+    const upsertResult = await supabase
       .from('profiles')
       .upsert({
         id: userId,
@@ -84,8 +84,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .select()
       .single();
 
-    if (!error && newProfile) {
-      setProfile(newProfile as Profile);
+    if (!upsertResult.error && upsertResult.data) {
+      setProfile(upsertResult.data as Profile);
     }
   }, []);
 
@@ -103,7 +103,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session: initialSession } }: { data: { session: Session | null } }) => {
+    supabase.auth.getSession().then((result) => {
+      const initialSession = result.data.session;
       setSession(initialSession);
       if (initialSession?.user) {
         setUser(initialSession.user);
@@ -115,8 +116,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: string, newSession: Session | null) => {
+    const listener = supabase.auth.onAuthStateChange(
+      async (event, newSession) => {
         setSession(newSession);
         
         if (event === 'SIGNED_IN' && newSession?.user) {
@@ -136,32 +137,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (newSession?.user) {
             setUser(newSession.user);
           }
-        } else if (event === 'INITIAL_SESSION') {
-          // Already handled above
-        } else {
-          setState('guest');
         }
+        // INITIAL_SESSION and others are handled by getSession above
       }
     );
 
     return () => {
-      subscription.unsubscribe();
+      listener.data.subscription.unsubscribe();
     };
   }, [configured, ensureProfile]);
 
   const signIn = useCallback(async (email: string, password: string) => {
     const supabase = getSupabaseClient();
-    if (!supabase) return { error: { message: 'Authentication service not configured', name: 'ConfigError' } as AuthError };
+    if (!supabase) {
+      const configError = { message: 'Authentication service not configured', name: 'ConfigError' } as AuthError;
+      return { error: configError };
+    }
 
     setState('signing_in');
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const result = await supabase.auth.signInWithPassword({ email, password });
     
-    if (error) {
+    if (result.error) {
       setState('guest');
-      setError(error.message);
-      return { error };
+      setError(result.error.message);
+      return { error: result.error };
     }
 
     return { error: null };
@@ -169,12 +170,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = useCallback(async (email: string, password: string, displayName: string) => {
     const supabase = getSupabaseClient();
-    if (!supabase) return { error: { message: 'Authentication service not configured', name: 'ConfigError' } as AuthError, needsEmailConfirmation: false };
+    if (!supabase) {
+      const configError = { message: 'Authentication service not configured', name: 'ConfigError' } as AuthError;
+      return { error: configError, needsEmailConfirmation: false };
+    }
 
     setState('signing_in');
     setError(null);
 
-    const { error } = await supabase.auth.signUp({
+    const result = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -182,15 +186,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
     });
 
-    if (error) {
+    if (result.error) {
       setState('guest');
-      setError(error.message);
-      return { error, needsEmailConfirmation: false };
+      setError(result.error.message);
+      return { error: result.error, needsEmailConfirmation: false };
     }
 
     // Check if email confirmation is required
-    const { data: { session: newSession } } = await supabase.auth.getSession();
-    if (!newSession) {
+    const sessionResult = await supabase.auth.getSession();
+    if (!sessionResult.data.session) {
       setState('guest');
       return { error: null, needsEmailConfirmation: true };
     }
@@ -212,37 +216,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = useCallback(async (email: string) => {
     const supabase = getSupabaseClient();
-    if (!supabase) return { error: { message: 'Authentication service not configured', name: 'ConfigError' } as AuthError };
+    if (!supabase) {
+      const configError = { message: 'Authentication service not configured', name: 'ConfigError' } as AuthError;
+      return { error: configError };
+    }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const result = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/update-password`,
     });
 
-    return { error };
+    return { error: result.error };
   }, []);
 
   const updatePassword = useCallback(async (password: string) => {
     const supabase = getSupabaseClient();
-    if (!supabase) return { error: { message: 'Authentication service not configured', name: 'ConfigError' } as AuthError };
+    if (!supabase) {
+      const configError = { message: 'Authentication service not configured', name: 'ConfigError' } as AuthError;
+      return { error: configError };
+    }
 
-    const { error } = await supabase.auth.updateUser({ password });
-    return { error };
+    const result = await supabase.auth.updateUser({ password });
+    return { error: result.error };
   }, []);
 
   const updateProfile = useCallback(async (updates: { display_name?: string }) => {
     const supabase = getSupabaseClient();
     if (!supabase || !user) return { error: 'Not authenticated' };
 
-    const { error } = await supabase
+    const result = await supabase
       .from('profiles')
       .update({ display_name: updates.display_name, updated_at: new Date().toISOString() })
       .eq('id', user.id);
 
-    if (!error) {
+    if (!result.error) {
       setProfile(prev => prev ? { ...prev, ...updates, updated_at: new Date().toISOString() } : null);
     }
 
-    return { error: error?.message || null };
+    return { error: result.error?.message || null };
   }, [user]);
 
   const refreshProfile = useCallback(async () => {

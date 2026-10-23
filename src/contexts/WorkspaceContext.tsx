@@ -368,10 +368,14 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     } else {
       const supabase = getSupabaseClient();
       if (supabase && user) {
-        const { project_id, title, selected_model_id, is_pinned, messages, ...rest } = updates;
-        await supabase.from('conversations').update({
-          project_id, title, selected_model_id, is_pinned, updated_at: now,
-        }).eq('id', id).eq('owner_id', user.id);
+        // Only send database-compatible fields (exclude messages which is client-only)
+        const dbUpdates: Record<string, unknown> = { updated_at: now };
+        if (updates.project_id !== undefined) dbUpdates.project_id = updates.project_id;
+        if (updates.title !== undefined) dbUpdates.title = updates.title;
+        if (updates.selected_model_id !== undefined) dbUpdates.selected_model_id = updates.selected_model_id;
+        if (updates.is_pinned !== undefined) dbUpdates.is_pinned = updates.is_pinned;
+        
+        await supabase.from('conversations').update(dbUpdates).eq('id', id).eq('owner_id', user.id);
         setConversations(prev => prev.map(c => c.id === id ? { ...c, ...updates, updated_at: now } : c));
       }
     }
