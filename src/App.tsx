@@ -23,6 +23,9 @@ import { IntegrationsHub } from './pages/IntegrationsHub';
 import { IntegrationsProvider } from './contexts/IntegrationsContext';
 import { OAuthCallbackHandler } from './pages/OAuthCallbackHandler';
 import { ToolExplorer } from './pages/ToolExplorer';
+import { StudiosHub } from './pages/StudiosHub';
+import { ResearchStudio } from './pages/ResearchStudio';
+import { DocsStudio } from './pages/DocsStudio';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -199,6 +202,36 @@ function AppRoutes() {
         <ProtectedRoute>
           <AppProviders>
             <OAuthCallbackHandler />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Studios */}
+      <Route path="/studios" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <StudiosHub />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/research" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <ResearchStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/docs" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <DocsStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/docs/:id" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <DocsStudio />
           </AppProviders>
         </ProtectedRoute>
       } />
