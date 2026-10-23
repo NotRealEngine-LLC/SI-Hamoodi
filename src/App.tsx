@@ -8,6 +8,7 @@ import { WorkspaceManagementProvider } from './contexts/WorkspaceManagementConte
 import { FileProvider } from './contexts/FileContext';
 import { IntelligenceProvider } from './contexts/IntelligenceContext';
 import { SuperAgentProvider } from './contexts/SuperAgentContext';
+import { MemoryProvider } from './contexts/MemoryContext';
 import { SignInPage, SignUpPage, ForgotPasswordPage, UpdatePasswordPage, AuthCallbackPage, OnboardingPage } from './pages/AuthPages';
 import { WorkspacePage } from './pages/WorkspacePage';
 import { HubsPage } from './pages/HubsPage';
@@ -15,6 +16,7 @@ import { FilesPage } from './pages/FilesPage';
 import { WorkspaceDashboard } from './pages/WorkspaceDashboard';
 import { SuperAgentCommandCenter } from './pages/SuperAgentCommandCenter';
 import { ExecutionHistoryPage } from './pages/ExecutionHistoryPage';
+import { MemoryManagementPage, SecondBrainDashboard } from './pages/MemoryPages';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -55,7 +57,9 @@ function AppProviders({ children }: { children: React.ReactNode }) {
         <FileProvider>
           <IntelligenceProvider>
             <SuperAgentProvider>
-              {children}
+              <MemoryProvider>
+                {children}
+              </MemoryProvider>
             </SuperAgentProvider>
           </IntelligenceProvider>
         </FileProvider>
@@ -124,6 +128,24 @@ function AppRoutes() {
         <ProtectedRoute>
           <AppProviders>
             <ExecutionHistoryPage />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Memory Management */}
+      <Route path="/memory" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <MemoryManagementPage />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* SecondBrain Dashboard */}
+      <Route path="/secondbrain" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SecondBrainDashboard />
           </AppProviders>
         </ProtectedRoute>
       } />
