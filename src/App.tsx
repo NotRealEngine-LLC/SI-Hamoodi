@@ -35,6 +35,9 @@ import { AgentBuilder } from './pages/AgentBuilder';
 import { SkillStudio } from './pages/SkillStudio';
 import { WorkflowBuilder } from './pages/WorkflowBuilder';
 import { AgentsProvider } from './contexts/AgentsContext';
+import { PricingPage } from './pages/PricingPage';
+import { BillingDashboard } from './pages/BillingDashboard';
+import { AnalyticsDashboard } from './pages/AnalyticsDashboard';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -350,6 +353,29 @@ function AppRoutes() {
         <ProtectedRoute>
           <AppProviders>
             <WorkflowBuilder />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Billing & Analytics */}
+      <Route path="/pricing" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <PricingPage />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/billing" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <BillingDashboard />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/analytics" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AnalyticsDashboard />
           </AppProviders>
         </ProtectedRoute>
       } />
