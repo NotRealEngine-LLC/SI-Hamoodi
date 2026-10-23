@@ -7,11 +7,13 @@ import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { WorkspaceManagementProvider } from './contexts/WorkspaceManagementContext';
 import { FileProvider } from './contexts/FileContext';
 import { IntelligenceProvider } from './contexts/IntelligenceContext';
+import { SuperAgentProvider } from './contexts/SuperAgentContext';
 import { SignInPage, SignUpPage, ForgotPasswordPage, UpdatePasswordPage, AuthCallbackPage, OnboardingPage } from './pages/AuthPages';
 import { WorkspacePage } from './pages/WorkspacePage';
 import { HubsPage } from './pages/HubsPage';
 import { FilesPage } from './pages/FilesPage';
 import { WorkspaceDashboard } from './pages/WorkspaceDashboard';
+import { SuperAgentCommandCenter } from './pages/SuperAgentCommandCenter';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -51,7 +53,9 @@ function AppProviders({ children }: { children: React.ReactNode }) {
       <WorkspaceManagementProvider>
         <FileProvider>
           <IntelligenceProvider>
-            {children}
+            <SuperAgentProvider>
+              {children}
+            </SuperAgentProvider>
           </IntelligenceProvider>
         </FileProvider>
       </WorkspaceManagementProvider>
@@ -101,6 +105,15 @@ function AppRoutes() {
         <ProtectedRoute>
           <AppProviders>
             <WorkspacePage />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Super Agent */}
+      <Route path="/agents" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SuperAgentCommandCenter />
           </AppProviders>
         </ProtectedRoute>
       } />

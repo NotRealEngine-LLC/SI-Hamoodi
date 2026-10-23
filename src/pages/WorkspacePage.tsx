@@ -120,6 +120,14 @@ function Sidebar({ activeView, setActiveView, selectedProject, setSelectedProjec
           <Clock size={16} />
           <span>Activity</span>
         </button>
+        <button
+          onClick={() => navigate('/agents')}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+        >
+          <Zap size={16} className="text-violet-400" />
+          <span>Super Agent</span>
+          <span className="ml-auto px-1.5 py-0.5 bg-violet-500/20 text-violet-300 text-[10px] rounded">NEW</span>
+        </button>
       </div>
 
       {/* Projects list */}
