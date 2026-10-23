@@ -4,7 +4,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
-import { SignInPage, SignUpPage, ForgotPasswordPage, UpdatePasswordPage, AuthCallbackPage } from './pages/AuthPages';
+import { SignInPage, SignUpPage, ForgotPasswordPage, UpdatePasswordPage, AuthCallbackPage, OnboardingPage } from './pages/AuthPages';
 import { WorkspacePage } from './pages/WorkspacePage';
 
 // Protected route wrapper
@@ -49,6 +49,7 @@ function AppRoutes() {
       <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/auth/update-password" element={<UpdatePasswordPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
+      <Route path="/onboarding" element={<OnboardingPage />} />
 
       {/* Workspace */}
       <Route path="/workspace" element={

@@ -569,41 +569,73 @@ function ConversationsOverview({ onSelectConversation }: { onSelectConversation:
 
 // ============ CONVERSATION VIEW ============
 function ConversationView({ conversation, onBack }: { conversation: Conversation; onBack: () => void }) {
-  const { addMessage, updateConversation, deleteConversation } = useWorkspace();
+  const { addMessage, updateConversation, deleteConversation, mode } = useWorkspace();
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
+  const [streamingContent, setStreamingContent] = useState('');
+  const [selectedModel, setSelectedModel] = useState(conversation.selected_model_id || 'gpt-4o-mini');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [conversation.messages]);
+  }, [conversation.messages, streamingContent]);
 
   const handleSend = async () => {
     if (!input.trim() || sending) return;
+    const userMsg = input.trim();
+    setInput('');
     setSending(true);
+    setStreamingContent('');
 
     // Add user message
     await addMessage(conversation.id, {
       role: 'user',
-      content: input.trim(),
+      content: userMsg,
       status: 'completed',
       model_id: null,
       conversation_id: conversation.id,
     });
 
-    // Simulate AI response (in production, this would call Puter.js or other AI)
-    const aiResponse = `This is a simulated response to: "${input.trim()}"\n\nIn the full HAMOODI SI system, this would be processed by the connected AI provider (Puter.js). The response would be streamed in real-time and persisted to your ${useWorkspace().mode === 'cloud' ? 'cloud workspace' : 'local storage'}.`;
+    try {
+      // Build conversation history for context
+      const history = conversation.messages
+        .filter(m => m.role === 'user' || m.role === 'assistant')
+        .map(m => ({ role: m.role, content: m.content }));
 
-    await addMessage(conversation.id, {
-      role: 'assistant',
-      content: aiResponse,
-      status: 'completed',
-      model_id: 'hamoodi-si-simulated',
-      conversation_id: conversation.id,
-    });
+      // Import and use Puter.js AI
+      const { sendAIRequest, isPuterAvailable } = await import('../lib/puter/ai');
+      
+      const aiResponse = await sendAIRequest(userMsg, {
+        model: selectedModel,
+        conversationHistory: history,
+        onStream: isPuterAvailable() ? (chunk) => setStreamingContent(prev => prev + chunk) : undefined,
+      });
 
-    setInput('');
+      // Persist assistant response
+      await addMessage(conversation.id, {
+        role: 'assistant',
+        content: aiResponse,
+        status: 'completed',
+        model_id: selectedModel,
+        conversation_id: conversation.id,
+      });
+
+      // Update conversation timestamp
+      await updateConversation(conversation.id, { updated_at: new Date().toISOString() } as Partial<Conversation>);
+    } catch (err) {
+      // Save error state
+      const errorMsg = err instanceof Error ? err.message : 'AI request failed';
+      await addMessage(conversation.id, {
+        role: 'assistant',
+        content: `⚠️ Error: ${errorMsg}\n\nYour message was saved. Please try again.`,
+        status: 'failed',
+        model_id: selectedModel,
+        conversation_id: conversation.id,
+      });
+    }
+
     setSending(false);
+    setStreamingContent('');
   };
 
   return (
@@ -665,6 +697,22 @@ function ConversationView({ conversation, onBack }: { conversation: Conversation
             )}
           </motion.div>
         ))}
+        {/* Streaming content display */}
+        {streamingContent && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex gap-3 justify-start"
+          >
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500/20 to-indigo-500/20 flex items-center justify-center shrink-0">
+              <Bot size={14} className="text-violet-400" />
+            </div>
+            <div className="max-w-[70%] px-4 py-3 rounded-2xl text-sm bg-zinc-800 text-zinc-200 rounded-bl-md border border-zinc-700/50">
+              <p className="whitespace-pre-wrap">{streamingContent}</p>
+              <span className="inline-block w-2 h-4 bg-violet-400 animate-pulse ml-1" />
+            </div>
+          </motion.div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
@@ -676,7 +724,8 @@ function ConversationView({ conversation, onBack }: { conversation: Conversation
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
             placeholder="Type a message..."
-            className="flex-1 px-4 py-3 bg-zinc-800/50 border border-zinc-700/50 rounded-xl text-white text-sm placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50"
+            disabled={sending}
+            className="flex-1 px-4 py-3 bg-zinc-800/50 border border-zinc-700/50 rounded-xl text-white text-sm placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/50 disabled:opacity-50"
           />
           <button
             onClick={handleSend}
