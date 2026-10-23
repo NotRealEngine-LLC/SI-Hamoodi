@@ -8,7 +8,7 @@ import {
   FolderOpen, MessageSquare, Plus, Settings, LogOut, User,
   Cloud, CloudOff, Pin, Trash2, Edit3, Check, X, Menu, ChevronRight,
   Sparkles, Send, Bot, Loader2, Zap, Globe, HardDrive,
-  Shield, RefreshCw, Database, CheckCircle, AlertCircle, Clock, TrendingUp
+  Shield, RefreshCw, Database, CheckCircle, AlertCircle, Clock, TrendingUp, Plug
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace, Project, Conversation, Message } from '../contexts/WorkspaceContext';
@@ -127,6 +127,14 @@ function Sidebar({ activeView, setActiveView, selectedProject, setSelectedProjec
           <Zap size={16} className="text-violet-400" />
           <span>Super Agent</span>
           <span className="ml-auto px-1.5 py-0.5 bg-violet-500/20 text-violet-300 text-[10px] rounded">NEW</span>
+        </button>
+        <button
+          onClick={() => navigate('/integrations')}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+        >
+          <Plug size={16} className="text-emerald-400" />
+          <span>Integrations</span>
+          <span className="ml-auto px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] rounded">NEW</span>
         </button>
       </div>
 

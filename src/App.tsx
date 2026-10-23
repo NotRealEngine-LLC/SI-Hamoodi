@@ -19,6 +19,9 @@ import { ExecutionHistoryPage } from './pages/ExecutionHistoryPage';
 import { MemoryManagementPage, SecondBrainDashboard } from './pages/MemoryPages';
 import { KnowledgeSearchUI } from './components/KnowledgeSearchUI';
 import { KnowledgeSettingsPage } from './pages/KnowledgeSettingsPage';
+import { IntegrationsHub } from './pages/IntegrationsHub';
+import { IntegrationsProvider } from './contexts/IntegrationsContext';
+import { OAuthCallbackHandler } from './pages/OAuthCallbackHandler';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -60,7 +63,9 @@ function AppProviders({ children }: { children: React.ReactNode }) {
           <IntelligenceProvider>
             <SuperAgentProvider>
               <MemoryProvider>
-                {children}
+                <IntegrationsProvider>
+                  {children}
+                </IntegrationsProvider>
               </MemoryProvider>
             </SuperAgentProvider>
           </IntelligenceProvider>
@@ -166,6 +171,24 @@ function AppRoutes() {
         <ProtectedRoute>
           <AppProviders>
             <KnowledgeSettingsPage />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Integrations */}
+      <Route path="/integrations" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <IntegrationsHub />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* OAuth Callback */}
+      <Route path="/integrations/oauth/callback" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <OAuthCallbackHandler />
           </AppProviders>
         </ProtectedRoute>
       } />
