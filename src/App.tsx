@@ -32,6 +32,8 @@ import { CreativeStudio } from './pages/CreativeStudio';
 import { DeveloperStudio } from './pages/DeveloperStudio';
 import { AgentsHub } from './pages/AgentsHub';
 import { AgentBuilder } from './pages/AgentBuilder';
+import { SkillStudio } from './pages/SkillStudio';
+import { WorkflowBuilder } from './pages/WorkflowBuilder';
 import { AgentsProvider } from './contexts/AgentsContext';
 
 // Protected route wrapper
@@ -320,6 +322,34 @@ function AppRoutes() {
         <ProtectedRoute>
           <AppProviders>
             <AgentBuilder />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/skills/new" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SkillStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/skills/:id/edit" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SkillStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/workflows/new" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <WorkflowBuilder />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/workflows/:id/edit" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <WorkflowBuilder />
           </AppProviders>
         </ProtectedRoute>
       } />
