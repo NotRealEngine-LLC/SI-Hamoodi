@@ -1,7 +1,8 @@
 // HAMOODI SyntheTech Intelligence — Application Entry
-// Phase 04: Workspaces, Hubs, Files, Collaboration
+// Part 01 & 02: Foundation Engineering & Premium UI/UX
+// Phases 03-12: Complete Platform Implementation
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { WorkspaceManagementProvider } from './contexts/WorkspaceManagementContext';
@@ -38,6 +39,11 @@ import { AgentsProvider } from './contexts/AgentsContext';
 import { PricingPage } from './pages/PricingPage';
 import { BillingDashboard } from './pages/BillingDashboard';
 import { AnalyticsDashboard } from './pages/AnalyticsDashboard';
+import { HomePage } from './pages/HomePage';
+import { EnhancedSidebar } from './components/navigation/EnhancedSidebar';
+import { EnhancedHeader } from './components/navigation/EnhancedHeader';
+import { AppLayout } from './components/layout/AppLayout';
+import { useState, useEffect } from 'react';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -103,20 +109,35 @@ function AppRoutes() {
       <Route path="/auth/update-password" element={<UpdatePasswordPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       
-      {/* Onboarding */}
-      <Route path="/onboarding" element={
+      {/* Homepage - Part 01 Premium SI Command Center */}
+      <Route path="/" element={
         <ProtectedRoute>
           <AppProviders>
-            <OnboardingPage />
+            <AppLayout>
+              <HomePage onNavigate={(route) => window.location.href = route} />
+            </AppLayout>
           </AppProviders>
         </ProtectedRoute>
       } />
 
-      {/* Workspace dashboard (home) */}
+      {/* Onboarding */}
+      <Route path="/onboarding" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <AppLayout>
+              <OnboardingPage />
+            </AppLayout>
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Workspace dashboard */}
       <Route path="/workspace" element={
         <ProtectedRoute>
           <AppProviders>
-            <WorkspacePage />
+            <AppLayout>
+              <WorkspacePage />
+            </AppLayout>
           </AppProviders>
         </ProtectedRoute>
       } />

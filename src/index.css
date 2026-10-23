@@ -1,10 +1,54 @@
 @import "tailwindcss";
 
 /* HAMOODI SyntheTech Intelligence — Global Styles */
-/* Phase 03: Premium Dark/Light Design System */
+/* Part 01: Premium Dark/Light Design System with Semantic Tokens */
 
 @layer base {
   :root {
+    /* Dark theme (default) */
+    --si-bg: #080B12;
+    --si-surface: #0E1320;
+    --si-surface-elevated: #141B2B;
+    --si-surface-interactive: #1B2537;
+    
+    --si-text-primary: #F4F7FC;
+    --si-text-secondary: #A6B3C9;
+    --si-text-muted: #76859E;
+    
+    --si-accent-primary: #9378FF;
+    --si-accent-cyan: #52DAD5;
+    --si-accent-lime: #C2F58D;
+    
+    --si-success: #59D9A7;
+    --si-warning: #F3BD65;
+    --si-danger: #FF6C7C;
+    
+    --si-border: rgba(175, 197, 230, 0.11);
+    --si-border-hover: rgba(175, 197, 230, 0.2);
+    
+    /* Typography */
+    --si-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --si-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    
+    /* Spacing */
+    --si-sidebar-expanded: 256px;
+    --si-sidebar-collapsed: 72px;
+    --si-header-height: 64px;
+    
+    /* Radius */
+    --si-radius-sm: 6px;
+    --si-radius-md: 10px;
+    --si-radius-lg: 14px;
+    --si-radius-xl: 18px;
+    --si-radius-2xl: 24px;
+    
+    /* Shadows */
+    --si-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --si-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --si-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --si-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Legacy compatibility */
     --color-primary: #7c3aed;
     --color-primary-hover: #8b5cf6;
     --color-bg: #0a0a0f;
@@ -15,6 +59,27 @@
   }
 
   html.light {
+    --si-bg: #F7F9FC;
+    --si-surface: #FFFFFF;
+    --si-surface-elevated: #F0F3F9;
+    --si-surface-interactive: #E8EDF5;
+    
+    --si-text-primary: #172033;
+    --si-text-secondary: #536078;
+    --si-text-muted: #728097;
+    
+    --si-accent-primary: #7C5CFF;
+    --si-accent-cyan: #3DB8B3;
+    --si-accent-lime: #8FD65F;
+    
+    --si-success: #3DB87F;
+    --si-warning: #D99A3D;
+    --si-danger: #E54D5D;
+    
+    --si-border: #E4E9F1;
+    --si-border-hover: #D0D7E3;
+    
+    /* Legacy compatibility */
     --color-bg: #fafafa;
     --color-surface: #ffffff;
     --color-border: #e4e4e7;
@@ -24,7 +89,7 @@
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: #3f3f46 transparent;
+    scrollbar-color: var(--si-border) transparent;
   }
 
   *::-webkit-scrollbar {
@@ -37,28 +102,45 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background-color: #3f3f46;
+    background-color: var(--si-border);
     border-radius: 3px;
   }
 
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--si-border-hover);
+  }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+    font-family: var(--si-font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: var(--color-bg);
-    color: var(--color-text);
+    background-color: var(--si-bg);
+    color: var(--si-text-primary);
+    line-height: 1.5;
   }
 
   /* Selection */
   ::selection {
-    background-color: rgba(124, 58, 237, 0.3);
-    color: white;
+    background-color: rgba(147, 120, 255, 0.3);
+    color: var(--si-text-primary);
   }
 
   /* Focus styles */
   :focus-visible {
-    outline: 2px solid rgba(124, 58, 237, 0.5);
+    outline: 2px solid var(--si-accent-primary);
     outline-offset: 2px;
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
