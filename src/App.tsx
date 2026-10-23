@@ -26,6 +26,10 @@ import { ToolExplorer } from './pages/ToolExplorer';
 import { StudiosHub } from './pages/StudiosHub';
 import { ResearchStudio } from './pages/ResearchStudio';
 import { DocsStudio } from './pages/DocsStudio';
+import { SheetsStudio } from './pages/SheetsStudio';
+import { SlidesStudio } from './pages/SlidesStudio';
+import { CreativeStudio } from './pages/CreativeStudio';
+import { DeveloperStudio } from './pages/DeveloperStudio';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -232,6 +236,62 @@ function AppRoutes() {
         <ProtectedRoute>
           <AppProviders>
             <DocsStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/sheets" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SheetsStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/sheets/:id" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SheetsStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/slides" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SlidesStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/slides/:id" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <SlidesStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/creative" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <CreativeStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/creative/:id" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <CreativeStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/code" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <DeveloperStudio />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+      <Route path="/studios/code/:id" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <DeveloperStudio />
           </AppProviders>
         </ProtectedRoute>
       } />
