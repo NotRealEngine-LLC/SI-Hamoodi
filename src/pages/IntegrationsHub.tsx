@@ -3,14 +3,16 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   Plug, Plus, CheckCircle, XCircle, AlertCircle, Loader2,
-  ExternalLink, RefreshCw, Trash2, Settings, Zap, Shield
+  ExternalLink, RefreshCw, Trash2, Settings, Zap, Shield, Play
 } from 'lucide-react';
 import { useIntegrations } from '../contexts/IntegrationsContext';
 import type { IntegrationConnection, IntegrationProvider } from '../lib/mcp/types';
 
 export function IntegrationsHub() {
+  const navigate = useNavigate();
   const { 
     providers, connections, toolCatalog, executionHistory,
     isLoadingProviders, isLoadingConnections, isLoadingTools,
@@ -157,10 +159,19 @@ export function IntegrationsHub() {
 
         {/* Available Tools */}
         <section className="mb-8">
-          <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <Shield size={18} className="text-emerald-400" />
-            Available Tools ({toolCatalog.length})
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+              <Shield size={18} className="text-emerald-400" />
+              Available Tools ({toolCatalog.length})
+            </h2>
+            <button
+              onClick={() => navigate('/integrations/tools')}
+              className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded-lg transition-all"
+            >
+              <Play size={12} />
+              <span>Open Tool Explorer</span>
+            </button>
+          </div>
 
           {isLoadingTools ? (
             <div className="flex justify-center py-12">

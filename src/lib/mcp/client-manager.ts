@@ -1,6 +1,8 @@
 // HAMOODI SyntheTech Intelligence — MCP Client Manager
-// Phase 08: Model Context Protocol client implementation
+// Phase 08: Model Context Protocol client implementation with official SDK
 
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { getSupabaseClient } from '../supabase/client';
 import {
   IntegrationConnection,
@@ -16,6 +18,7 @@ import {
 
 export class SIMCPClientManager {
   private activeConnections: Map<string, MCPServer> = new Map();
+  private clientInstances: Map<string, { client: Client; transport: StreamableHTTPClientTransport }> = new Map();
 
   /**
    * Connect to an MCP server
@@ -78,108 +81,178 @@ export class SIMCPClientManager {
   }
 
   /**
-   * Initialize MCP server connection
+   * Initialize MCP server connection using official SDK
    */
   private async initializeMCPServer(connection: IntegrationConnection): Promise<MCPServer> {
-    // In production, this would use the official MCP SDK
-    // For now, simulate MCP server initialization
-    
-    // Validate endpoint
+    // Validate endpoint for SSRF protection
     const endpoint = connection.mcp_endpoint!;
     if (!this.isValidEndpoint(endpoint)) {
-      throw new ConnectionError('Invalid MCP endpoint');
+      throw new ConnectionError('Invalid MCP endpoint - SSRF protection blocked this URL');
     }
 
-    // Simulate MCP initialization handshake
-    // In production: const client = new MCPClient(endpoint);
-    // await client.initialize();
+    try {
+      // Create MCP client with Streamable HTTP transport
+      const transport = new StreamableHTTPClientTransport(new URL(endpoint));
+      const client = new Client(
+        {
+          name: 'hamoodi-si-client',
+          version: '1.0.0',
+        },
+        {
+          capabilities: {
+            roots: { listChanged: true },
+          },
+        }
+      );
 
-    const capabilities: MCPCapabilities = {
-      tools: { listChanged: true },
-      resources: { subscribe: false, listChanged: true },
-      prompts: { listChanged: true },
-    };
+      // Connect to the server
+      await client.connect(transport);
 
-    return {
-      id: crypto.randomUUID(),
-      connection_id: connection.id,
-      server_name: `MCP Server ${connection.name}`,
-      server_version: '1.0.0',
-      protocol_version: connection.mcp_protocol_version || '2026-07-28',
-      transport_type: 'streamable_http',
-      capabilities,
-      tools_count: 0,
-      resources_count: 0,
-      prompts_count: 0,
-      is_connected: true,
-      last_connected_at: new Date().toISOString(),
-      last_discovery_at: new Date().toISOString(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+      // Get server capabilities
+      const serverCapabilities = client.getServerCapabilities();
+      const serverInfo = client.getServerVersion();
+
+      // Discover tools, resources, and prompts
+      const tools = await client.listTools();
+      const resources = serverCapabilities?.resources ? await client.listResources() : { resources: [] };
+      const prompts = serverCapabilities?.prompts ? await client.listPrompts() : { prompts: [] };
+
+      const capabilities: MCPCapabilities = {
+        tools: serverCapabilities?.tools || { listChanged: false },
+        resources: serverCapabilities?.resources || { subscribe: false, listChanged: false },
+        prompts: serverCapabilities?.prompts || { listChanged: false },
+        logging: serverCapabilities?.logging,
+      };
+
+      // Store the client instance for later use
+      this.clientInstances.set(connection.id, { client, transport });
+
+      return {
+        id: crypto.randomUUID(),
+        connection_id: connection.id,
+        server_name: serverInfo?.name || `MCP Server ${connection.name}`,
+        server_version: serverInfo?.version || '1.0.0',
+        protocol_version: connection.mcp_protocol_version || '2026-07-28',
+        transport_type: 'streamable_http',
+        capabilities,
+        tools_count: tools.tools?.length || 0,
+        resources_count: resources.resources?.length || 0,
+        prompts_count: prompts.prompts?.length || 0,
+        is_connected: true,
+        last_connected_at: new Date().toISOString(),
+        last_discovery_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+    } catch (error) {
+      throw new ConnectionError(
+        `Failed to initialize MCP server: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 
   /**
-   * Discover tools from MCP server
+   * Discover tools from MCP server using real SDK
    */
   async discoverTools(connectionId: string): Promise<MCPTool[]> {
-    const connection = this.activeConnections.get(connectionId);
-    if (!connection) {
+    const instance = this.clientInstances.get(connectionId);
+    if (!instance) {
       throw new ConnectionError('Not connected to MCP server');
     }
 
-    // In production, this would call the MCP SDK
-    // const tools = await client.listTools();
-
-    // Simulate tool discovery
-    // In production, return actual tools from MCP server
-    return [];
+    try {
+      const result = await instance.client.listTools();
+      // Map SDK tool format to our MCPTool interface
+      return (result.tools || []).map((tool: any) => ({
+        name: tool.name,
+        description: tool.description || '',
+        inputSchema: tool.inputSchema || { type: 'object', properties: {} },
+        outputSchema: tool.outputSchema,
+        annotations: tool.annotations,
+      }));
+    } catch (error) {
+      throw new ConnectionError(
+        `Failed to discover tools: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 
   /**
-   * Discover resources from MCP server
+   * Discover resources from MCP server using real SDK
    */
   async discoverResources(connectionId: string): Promise<MCPResource[]> {
-    const connection = this.activeConnections.get(connectionId);
-    if (!connection) {
+    const instance = this.clientInstances.get(connectionId);
+    if (!instance) {
       throw new ConnectionError('Not connected to MCP server');
     }
 
-    // In production: const resources = await client.listResources();
-    return [];
+    try {
+      const result = await instance.client.listResources();
+      // Map SDK resource format to our MCPResource interface
+      return (result.resources || []).map((resource: any) => ({
+        uri: resource.uri,
+        name: resource.name,
+        description: resource.description,
+        mimeType: resource.mimeType,
+        annotations: resource.annotations,
+      }));
+    } catch (error) {
+      throw new ConnectionError(
+        `Failed to discover resources: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 
   /**
-   * Discover prompts from MCP server
+   * Discover prompts from MCP server using real SDK
    */
   async discoverPrompts(connectionId: string): Promise<MCPPrompt[]> {
-    const connection = this.activeConnections.get(connectionId);
-    if (!connection) {
+    const instance = this.clientInstances.get(connectionId);
+    if (!instance) {
       throw new ConnectionError('Not connected to MCP server');
     }
 
-    // In production: const prompts = await client.listPrompts();
-    return [];
+    try {
+      const result = await instance.client.listPrompts();
+      // Map SDK prompt format to our MCPPrompt interface
+      return (result.prompts || []).map((prompt: any) => ({
+        name: prompt.name,
+        description: prompt.description,
+        arguments: prompt.arguments,
+      }));
+    } catch (error) {
+      throw new ConnectionError(
+        `Failed to discover prompts: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 
   /**
-   * Invoke a tool on MCP server
+   * Invoke a tool on MCP server using real SDK
    */
   async invokeTool(
     connectionId: string,
     toolName: string,
     input: Record<string, any>
   ): Promise<any> {
-    const connection = this.activeConnections.get(connectionId);
-    if (!connection) {
+    const instance = this.clientInstances.get(connectionId);
+    if (!instance) {
       throw new ConnectionError('Not connected to MCP server');
     }
 
-    // In production, this would use the MCP SDK
-    // const result = await client.callTool(toolName, input);
-
-    // Simulate tool invocation
-    throw new Error('Tool invocation not yet implemented - requires MCP SDK integration');
+    try {
+      const result = await instance.client.callTool({
+        name: toolName,
+        arguments: input,
+      });
+      
+      // Return the tool result content
+      return result.content;
+    } catch (error) {
+      throw new ConnectionError(
+        `Tool invocation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 
   /**
@@ -187,28 +260,40 @@ export class SIMCPClientManager {
    */
   async disconnect(connectionId: string): Promise<void> {
     const supabase = getSupabaseClient();
-    if (!supabase) return;
+    
+    // Close the MCP client connection
+    const instance = this.clientInstances.get(connectionId);
+    if (instance) {
+      try {
+        await instance.client.close();
+      } catch (error) {
+        console.error('Error closing MCP client:', error);
+      }
+      this.clientInstances.delete(connectionId);
+    }
 
     // Remove from active connections
     this.activeConnections.delete(connectionId);
 
-    // Update connection status
-    await supabase
-      .from('integration_connections')
-      .update({
-        status: 'disconnected',
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', connectionId);
+    // Update connection status in database
+    if (supabase) {
+      await supabase
+        .from('integration_connections')
+        .update({
+          status: 'disconnected',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', connectionId);
 
-    // Update MCP server record
-    await supabase
-      .from('mcp_servers')
-      .update({
-        is_connected: false,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('connection_id', connectionId);
+      // Update MCP server record
+      await supabase
+        .from('mcp_servers')
+        .update({
+          is_connected: false,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('connection_id', connectionId);
+    }
   }
 
   /**

@@ -22,6 +22,7 @@ import { KnowledgeSettingsPage } from './pages/KnowledgeSettingsPage';
 import { IntegrationsHub } from './pages/IntegrationsHub';
 import { IntegrationsProvider } from './contexts/IntegrationsContext';
 import { OAuthCallbackHandler } from './pages/OAuthCallbackHandler';
+import { ToolExplorer } from './pages/ToolExplorer';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -180,6 +181,15 @@ function AppRoutes() {
         <ProtectedRoute>
           <AppProviders>
             <IntegrationsHub />
+          </AppProviders>
+        </ProtectedRoute>
+      } />
+
+      {/* Tool Explorer */}
+      <Route path="/integrations/tools" element={
+        <ProtectedRoute>
+          <AppProviders>
+            <ToolExplorer />
           </AppProviders>
         </ProtectedRoute>
       } />
