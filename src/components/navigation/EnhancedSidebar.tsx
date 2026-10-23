@@ -1,5 +1,5 @@
-// HAMOODI SyntheTech Intelligence — Enhanced Sidebar Navigation
-// Part 01: Professional interactive sidebar with animations
+// HAMOODI SyntheTech Intelligence — Premium Sidebar Navigation
+// Polished for MVP Demo - GenSpark-inspired design
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,7 +16,8 @@ import {
   Sun,
   User,
   LogOut,
-  Sparkles
+  Sparkles,
+  Plus
 } from 'lucide-react';
 import { BrandWordmark, BrandSignature } from '../brand/BrandComponents';
 
@@ -81,7 +82,7 @@ export function EnhancedSidebar({
       {/* Mobile toggle button */}
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-[var(--si-surface)] border border-[var(--si-border)] rounded-lg shadow-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 bg-[var(--si-surface)] border border-[var(--si-border)] rounded-xl shadow-lg hover:bg-[var(--si-surface-hover)] transition-all duration-200"
         aria-label="Toggle menu"
       >
         {isMobileOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
@@ -95,7 +96,7 @@ export function EnhancedSidebar({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsMobileOpen(false)}
-            className="lg:hidden fixed inset-0 bg-black/50 z-40"
+            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
           />
         )}
       </AnimatePresence>
@@ -107,22 +108,23 @@ export function EnhancedSidebar({
           width: isExpanded ? 'var(--si-sidebar-expanded)' : 'var(--si-sidebar-collapsed)',
           x: 0
         }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         className={`
           fixed lg:relative top-0 left-0 h-full z-40
           bg-[var(--si-surface)] border-r border-[var(--si-border)]
           flex flex-col overflow-hidden
-          transition-all duration-300
+          shadow-xl
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
-        style={{ width: isExpanded ? '256px' : '72px' }}
+        style={{ width: isExpanded ? '260px' : '72px' }}
       >
         {/* Brand area */}
-        <div className="p-4 border-b border-[var(--si-border)]">
+        <div className="p-5 border-b border-[var(--si-border)]">
           {isExpanded ? (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.2 }}
             >
               <BrandWordmark />
@@ -144,15 +146,24 @@ export function EnhancedSidebar({
         {onToggleCollapse && (
           <button
             onClick={onToggleCollapse}
-            className="hidden lg:flex items-center justify-center p-2 mx-2 mt-2 rounded-lg hover:bg-[var(--si-surface-interactive)] transition-colors"
+            className="hidden lg:flex items-center justify-center p-2 mx-3 mt-3 rounded-lg hover:bg-[var(--si-surface-hover)] transition-all duration-200 group"
             aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
           >
-            {isExpanded ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+            >
+              {isExpanded ? (
+                <ChevronLeft size={16} className="text-[var(--si-text-muted)] group-hover:text-[var(--si-text-primary)] transition-colors" />
+              ) : (
+                <ChevronRight size={16} className="text-[var(--si-text-muted)] group-hover:text-[var(--si-text-primary)] transition-colors" />
+              )}
+            </motion.div>
           </button>
         )}
 
         {/* Primary navigation */}
-        <nav className="flex-1 overflow-y-auto p-2 space-y-1">
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
           {primaryNav.map((item) => {
             const isActive = currentRoute === item.route;
             const Icon = item.icon;
@@ -160,15 +171,15 @@ export function EnhancedSidebar({
             return (
               <motion.button
                 key={item.route}
-                whileHover={{ x: 2 }}
+                whileHover={{ x: 4 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleNavClick(item.route)}
                 className={`
                   w-full flex items-center gap-3 px-3 py-2.5 rounded-xl
-                  transition-all duration-200 relative
+                  transition-all duration-200 relative group
                   ${isActive 
-                    ? 'bg-gradient-to-r from-[#9378ff]/20 to-[#52dad5]/10 text-[#9378ff] border border-[#9378ff]/30' 
-                    : 'text-[var(--si-text-secondary)] hover:bg-[var(--si-surface-interactive)] hover:text-[var(--si-text-primary)]'
+                    ? 'bg-gradient-to-r from-[#8B5CF6]/20 to-[#06B6D4]/10 text-[#8B5CF6] border border-[#8B5CF6]/30 shadow-lg shadow-[#8B5CF6]/10' 
+                    : 'text-[var(--si-text-secondary)] hover:bg-[var(--si-surface-hover)] hover:text-[var(--si-text-primary)]'
                   }
                 `}
                 title={!isExpanded ? item.label : undefined}
@@ -191,7 +202,7 @@ export function EnhancedSidebar({
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="ml-auto px-2 py-0.5 text-xs font-medium bg-[#9378ff] text-white rounded-full"
+                    className="ml-auto px-2.5 py-0.5 text-xs font-semibold bg-gradient-to-r from-[#8B5CF6] to-[#6D28D9] text-white rounded-full shadow-md"
                   >
                     {item.badge}
                   </motion.span>
@@ -199,7 +210,7 @@ export function EnhancedSidebar({
                 {isActive && (
                   <motion.div
                     layoutId="activeIndicator"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-[#9378ff] rounded-r-full"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-[#8B5CF6] to-[#06B6D4] rounded-r-full"
                     transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                   />
                 )}
@@ -210,23 +221,24 @@ export function EnhancedSidebar({
           {/* Recent conversations section */}
           {isExpanded && recentConversations.length > 0 && (
             <div className="mt-6 pt-6 border-t border-[var(--si-border)]">
-              <h3 className="px-3 mb-2 text-xs font-semibold text-[var(--si-text-muted)] uppercase tracking-wider">
+              <h3 className="px-3 mb-3 text-xs font-semibold text-[var(--si-text-muted)] uppercase tracking-wider flex items-center gap-2">
+                <MessageSquare size={12} />
                 Recent Chats
               </h3>
               <div className="space-y-1">
                 {recentConversations.map((conv) => (
                   <motion.button
                     key={conv.id}
-                    whileHover={{ x: 2 }}
+                    whileHover={{ x: 4 }}
                     onClick={() => handleNavClick(`/chat/${conv.id}`)}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left hover:bg-[var(--si-surface-interactive)] transition-colors group"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-[var(--si-surface-hover)] transition-all duration-200 group"
                   >
-                    <MessageSquare size={14} className="text-[var(--si-text-muted)] group-hover:text-[#9378ff] transition-colors" />
+                    <MessageSquare size={14} className="text-[var(--si-text-muted)] group-hover:text-[#8B5CF6] transition-colors flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-[var(--si-text-secondary)] group-hover:text-[var(--si-text-primary)] truncate">
+                      <p className="text-sm text-[var(--si-text-secondary)] group-hover:text-[var(--si-text-primary)] truncate transition-colors">
                         {conv.title}
                       </p>
-                      <p className="text-xs text-[var(--si-text-muted)]">
+                      <p className="text-xs text-[var(--si-text-muted)] mt-0.5">
                         {conv.time}
                       </p>
                     </div>
@@ -239,23 +251,24 @@ export function EnhancedSidebar({
           {/* Recent projects section */}
           {isExpanded && recentProjects.length > 0 && (
             <div className="mt-6 pt-6 border-t border-[var(--si-border)]">
-              <h3 className="px-3 mb-2 text-xs font-semibold text-[var(--si-text-muted)] uppercase tracking-wider">
+              <h3 className="px-3 mb-3 text-xs font-semibold text-[var(--si-text-muted)] uppercase tracking-wider flex items-center gap-2">
+                <FolderKanban size={12} />
                 Recent Projects
               </h3>
               <div className="space-y-1">
                 {recentProjects.map((project) => (
                   <motion.button
                     key={project.id}
-                    whileHover={{ x: 2 }}
+                    whileHover={{ x: 4 }}
                     onClick={() => handleNavClick(`/projects/${project.id}`)}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left hover:bg-[var(--si-surface-interactive)] transition-colors group"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-[var(--si-surface-hover)] transition-all duration-200 group"
                   >
-                    <FolderKanban size={14} className="text-[var(--si-text-muted)] group-hover:text-[#52dad5] transition-colors" />
+                    <FolderKanban size={14} className="text-[var(--si-text-muted)] group-hover:text-[#06B6D4] transition-colors flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-[var(--si-text-secondary)] group-hover:text-[var(--si-text-primary)] truncate">
+                      <p className="text-sm text-[var(--si-text-secondary)] group-hover:text-[var(--si-text-primary)] truncate transition-colors">
                         {project.title}
                       </p>
-                      <p className="text-xs text-[var(--si-text-muted)]">
+                      <p className="text-xs text-[var(--si-text-muted)] mt-0.5">
                         {project.status}
                       </p>
                     </div>
@@ -267,16 +280,40 @@ export function EnhancedSidebar({
         </nav>
 
         {/* Bottom section */}
-        <div className="p-2 border-t border-[var(--si-border)] space-y-1">
+        <div className="p-3 border-t border-[var(--si-border)] space-y-1">
+          {/* New chat button */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => handleNavClick('/chat')}
+            className="w-full flex items-center gap-3 px-3 py-2.5 bg-gradient-to-r from-[#8B5CF6] to-[#6D28D9] text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+          >
+            <Plus size={20} className="flex-shrink-0" />
+            {isExpanded && (
+              <motion.span
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                className="text-sm font-semibold whitespace-nowrap overflow-hidden"
+              >
+                New Chat
+              </motion.span>
+            )}
+          </motion.button>
+
           {/* Theme toggle */}
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onToggleTheme}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[var(--si-text-secondary)] hover:bg-[var(--si-surface-interactive)] hover:text-[var(--si-text-primary)] transition-all"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[var(--si-text-secondary)] hover:bg-[var(--si-surface-hover)] hover:text-[var(--si-text-primary)] transition-all duration-200"
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           >
-            {isDark ? <Sun size={20} className="flex-shrink-0" /> : <Moon size={20} className="flex-shrink-0" />}
+            {isDark ? (
+              <Sun size={20} className="flex-shrink-0 text-[#F59E0B]" />
+            ) : (
+              <Moon size={20} className="flex-shrink-0 text-[#8B5CF6]" />
+            )}
             <AnimatePresence>
               {isExpanded && (
                 <motion.span
@@ -297,9 +334,9 @@ export function EnhancedSidebar({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => handleNavClick('/settings')}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[var(--si-text-secondary)] hover:bg-[var(--si-surface-interactive)] hover:text-[var(--si-text-primary)] transition-all"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[var(--si-text-secondary)] hover:bg-[var(--si-surface-hover)] hover:text-[var(--si-text-primary)] transition-all duration-200"
             >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#9378ff] to-[#52dad5] flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#06B6D4] flex items-center justify-center flex-shrink-0 shadow-md">
                 <User size={16} className="text-white" />
               </div>
               <AnimatePresence>
@@ -328,7 +365,7 @@ export function EnhancedSidebar({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={onSignOut}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[var(--si-text-muted)] hover:bg-[var(--si-danger)]/10 hover:text-[var(--si-danger)] transition-all"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[var(--si-text-muted)] hover:bg-[var(--si-danger)]/10 hover:text-[var(--si-danger)] transition-all duration-200"
               title="Sign out"
             >
               <LogOut size={20} className="flex-shrink-0" />
@@ -354,8 +391,8 @@ export function EnhancedSidebar({
               animate={{ opacity: 1 }}
               className="flex items-center gap-2 px-3 py-2 mt-2"
             >
-              <div className="w-2 h-2 rounded-full bg-[#59d9a7] animate-pulse" />
-              <span className="text-xs text-[var(--si-text-muted)]">
+              <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shadow-lg shadow-[#10B981]/50" />
+              <span className="text-xs text-[var(--si-text-muted)] font-medium">
                 AI Connected
               </span>
             </motion.div>

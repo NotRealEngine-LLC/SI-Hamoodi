@@ -1,5 +1,6 @@
 // HAMOODI SyntheTech Intelligence — SI Command Center Homepage
 // Part 01: Premium homepage with Synthetic Core visualization
+// Polished for MVP Demo - GenSpark-inspired design
 
 import { motion } from 'framer-motion';
 import { SyntheticCore, SyntheticCoreFallback } from '../components/SyntheticCore';
@@ -12,7 +13,10 @@ import {
   Zap, 
   Brain,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  TrendingUp,
+  Shield,
+  Clock
 } from 'lucide-react';
 
 interface HomePageProps {
@@ -42,28 +46,50 @@ export function HomePage({ onNavigate, reducedMotion = false }: HomePageProps) {
       title: 'Start a Conversation',
       description: 'Chat with AI about any topic',
       route: '/chat',
-      color: 'from-[#9378ff] to-[#7c5cff]',
+      gradient: 'from-[#8B5CF6] to-[#6D28D9]',
+      shadowColor: 'shadow-[#8B5CF6]/20',
     },
     {
       icon: FolderKanban,
       title: 'Create a Project',
       description: 'Organize your work and ideas',
       route: '/projects',
-      color: 'from-[#52dad5] to-[#3db8b3]',
+      gradient: 'from-[#06B6D4] to-[#0891B2]',
+      shadowColor: 'shadow-[#06B6D4]/20',
     },
     {
       icon: Zap,
       title: 'Explore Automations',
       description: 'Discover workflow templates',
-      route: '/automations',
-      color: 'from-[#c2f58d] to-[#8fd65f]',
+      route: '/agents',
+      gradient: 'from-[#10B981] to-[#059669]',
+      shadowColor: 'shadow-[#10B981]/20',
     },
     {
       icon: Brain,
       title: 'Access Memory',
       description: 'View your knowledge base',
       route: '/memory',
-      color: 'from-[#f3bd65] to-[#d99a3d]',
+      gradient: 'from-[#F59E0B] to-[#D97706]',
+      shadowColor: 'shadow-[#F59E0B]/20',
+    },
+  ];
+
+  const features = [
+    {
+      icon: Shield,
+      title: 'Secure & Private',
+      description: 'Your data stays yours with enterprise-grade security',
+    },
+    {
+      icon: TrendingUp,
+      title: 'Intelligent Automation',
+      description: 'AI-powered workflows that adapt to your needs',
+    },
+    {
+      icon: Clock,
+      title: 'Real-time Collaboration',
+      description: 'Work seamlessly with your team across projects',
     },
   ];
 
@@ -74,40 +100,43 @@ export function HomePage({ onNavigate, reducedMotion = false }: HomePageProps) {
       animate="visible"
       variants={reducedMotion ? {} : {
         hidden: { opacity: 0 },
-        visible: { opacity: 1, transition: { duration: 0.5 } }
+        visible: { opacity: 1, transition: { duration: 0.6 } }
       }}
     >
-      {/* Background gradient orbs */}
+      {/* Enhanced background with mesh gradient */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#9378ff] rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" />
-        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-[#52dad5] rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-[#c2f58d] rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" style={{ animationDelay: '4s' }} />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-mesh opacity-30" />
+        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-[#8B5CF6] rounded-full mix-blend-multiply filter blur-[150px] opacity-15 animate-pulse" />
+        <div className="absolute top-1/3 right-1/4 w-[600px] h-[600px] bg-[#06B6D4] rounded-full mix-blend-multiply filter blur-[150px] opacity-15 animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-1/4 left-1/3 w-[600px] h-[600px] bg-[#10B981] rounded-full mix-blend-multiply filter blur-[150px] opacity-10 animate-pulse" style={{ animationDelay: '4s' }} />
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 lg:py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[calc(100vh-200px)]">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 lg:py-24">
+        <div className="grid lg:grid-cols-2 gap-16 items-center min-h-[calc(100vh-240px)]">
           
           {/* Left column - Text content */}
-          <div className="space-y-8">
+          <div className="space-y-10">
             {/* Eyebrow */}
             <motion.div
               variants={introVariants.eyebrow}
-              className="flex items-center gap-2 text-sm font-medium tracking-wider text-[#9378ff] uppercase"
+              className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-[var(--si-surface-interactive)] border border-[var(--si-border)] backdrop-blur-sm"
             >
               <SISymbol size={20} />
-              <span>Synthetic Intelligence Workspace</span>
+              <span className="text-gradient-primary font-semibold text-sm tracking-wide">
+                SYNTHETIC INTELLIGENCE WORKSPACE
+              </span>
             </motion.div>
 
             {/* Main headline */}
             <motion.h1
               variants={introVariants.headline}
-              className="text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-[var(--si-text-primary)] leading-tight"
+              className="text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-[var(--si-text-primary)] leading-[1.1]"
               style={{ fontSize: 'clamp(48px, 5vw, 72px)' }}
             >
               What will we
               <br />
-              <span className="bg-gradient-to-r from-[#9378ff] via-[#52dad5] to-[#c2f58d] bg-clip-text text-transparent">
+              <span className="text-gradient-accent">
                 build today?
               </span>
             </motion.h1>
@@ -115,7 +144,7 @@ export function HomePage({ onNavigate, reducedMotion = false }: HomePageProps) {
             {/* Supporting text */}
             <motion.p
               variants={introVariants.supporting}
-              className="text-lg lg:text-xl text-[var(--si-text-secondary)] max-w-xl leading-relaxed"
+              className="text-xl text-[var(--si-text-secondary)] max-w-xl leading-relaxed"
             >
               Explore ideas, solve complex problems, and turn intent into meaningful work with AI-powered intelligence.
             </motion.p>
@@ -123,9 +152,10 @@ export function HomePage({ onNavigate, reducedMotion = false }: HomePageProps) {
             {/* AI Composer */}
             <motion.div
               variants={introVariants.composer}
-              className="relative"
+              className="relative group"
             >
-              <div className="bg-[var(--si-surface)] border border-[var(--si-border)] rounded-2xl p-6 shadow-2xl hover:border-[var(--si-border-hover)] transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#8B5CF6] to-[#06B6D4] rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity duration-500" />
+              <div className="relative bg-[var(--si-surface)] border border-[var(--si-border)] rounded-2xl p-6 shadow-2xl hover:border-[var(--si-border-hover)] transition-all duration-300">
                 <div className="flex items-start gap-4">
                   <div className="flex-1">
                     <textarea
@@ -141,10 +171,10 @@ export function HomePage({ onNavigate, reducedMotion = false }: HomePageProps) {
                     />
                   </div>
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => onNavigate('/chat')}
-                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#9378ff] to-[#7c5cff] text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#8B5CF6] to-[#6D28D9] text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                   >
                     <Sparkles size={18} />
                     <span>Send</span>
@@ -153,25 +183,18 @@ export function HomePage({ onNavigate, reducedMotion = false }: HomePageProps) {
                 
                 {/* Quick actions */}
                 <div className="flex items-center gap-2 mt-4 pt-4 border-t border-[var(--si-border)]">
-                  <span className="text-xs text-[var(--si-text-muted)]">Quick:</span>
-                  <button
-                    onClick={() => onNavigate('/chat')}
-                    className="text-xs px-3 py-1.5 bg-[var(--si-surface-interactive)] text-[var(--si-text-secondary)] rounded-lg hover:bg-[var(--si-surface-elevated)] transition-colors"
-                  >
-                    Write code
-                  </button>
-                  <button
-                    onClick={() => onNavigate('/chat')}
-                    className="text-xs px-3 py-1.5 bg-[var(--si-surface-interactive)] text-[var(--si-text-secondary)] rounded-lg hover:bg-[var(--si-surface-elevated)] transition-colors"
-                  >
-                    Analyze data
-                  </button>
-                  <button
-                    onClick={() => onNavigate('/chat')}
-                    className="text-xs px-3 py-1.5 bg-[var(--si-surface-interactive)] text-[var(--si-text-secondary)] rounded-lg hover:bg-[var(--si-surface-elevated)] transition-colors"
-                  >
-                    Create content
-                  </button>
+                  <span className="text-xs text-[var(--si-text-muted)] font-medium">Quick:</span>
+                  {['Write code', 'Analyze data', 'Create content'].map((action) => (
+                    <motion.button
+                      key={action}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => onNavigate('/chat')}
+                      className="text-xs px-3 py-1.5 bg-[var(--si-surface-interactive)] text-[var(--si-text-secondary)] rounded-lg hover:bg-[var(--si-surface-hover)] hover:text-[var(--si-text-primary)] transition-all duration-200 border border-[var(--si-border)]"
+                    >
+                      {action}
+                    </motion.button>
+                  ))}
                 </div>
               </div>
             </motion.div>
@@ -179,20 +202,21 @@ export function HomePage({ onNavigate, reducedMotion = false }: HomePageProps) {
             {/* Stats */}
             <motion.div
               variants={introVariants.supporting}
-              className="flex items-center gap-8 text-sm text-[var(--si-text-muted)]"
+              className="flex items-center gap-8 text-sm"
             >
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#59d9a7]" />
-                <span>AI Ready</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#52dad5]" />
-                <span>Secure</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#9378ff]" />
-                <span>Fast</span>
-              </div>
+              {[
+                { color: '#10B981', label: 'AI Ready' },
+                { color: '#06B6D4', label: 'Secure' },
+                { color: '#8B5CF6', label: 'Fast' },
+              ].map((stat) => (
+                <div key={stat.label} className="flex items-center gap-2">
+                  <div 
+                    className="w-2 h-2 rounded-full animate-pulse" 
+                    style={{ backgroundColor: stat.color }}
+                  />
+                  <span className="text-[var(--si-text-muted)] font-medium">{stat.label}</span>
+                </div>
+              ))}
             </motion.div>
           </div>
 
@@ -209,7 +233,7 @@ export function HomePage({ onNavigate, reducedMotion = false }: HomePageProps) {
             
             {/* Floating accent elements */}
             <motion.div
-              className="absolute top-10 right-10 w-20 h-20 bg-[#9378ff] rounded-full blur-2xl opacity-20"
+              className="absolute top-10 right-10 w-24 h-24 bg-[#8B5CF6] rounded-full blur-3xl opacity-20"
               animate={{
                 scale: [1, 1.2, 1],
                 opacity: [0.2, 0.3, 0.2],
@@ -221,7 +245,7 @@ export function HomePage({ onNavigate, reducedMotion = false }: HomePageProps) {
               }}
             />
             <motion.div
-              className="absolute bottom-20 left-10 w-32 h-32 bg-[#52dad5] rounded-full blur-3xl opacity-20"
+              className="absolute bottom-20 left-10 w-32 h-32 bg-[#06B6D4] rounded-full blur-3xl opacity-20"
               animate={{
                 scale: [1, 1.3, 1],
                 opacity: [0.2, 0.35, 0.2],
@@ -239,46 +263,51 @@ export function HomePage({ onNavigate, reducedMotion = false }: HomePageProps) {
         {/* Suggested actions grid */}
         <motion.div
           variants={introVariants.composer}
-          className="mt-20 lg:mt-32"
+          className="mt-24 lg:mt-32"
         >
-          <h2 className="text-2xl font-bold text-[var(--si-text-primary)] mb-8">
-            Get Started
-          </h2>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-[var(--si-text-primary)] mb-3">
+              Get Started
+            </h2>
+            <p className="text-[var(--si-text-secondary)]">
+              Choose from our powerful suite of AI tools
+            </p>
+          </div>
           
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {suggestedActions.map((action, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {suggestedActions.map((action, index) => (
               <motion.button
                 key={action.title}
-                custom={i}
+                custom={index}
                 variants={introVariants.action}
-                whileHover={{ y: -4, scale: 1.02 }}
+                whileHover={{ y: -8, scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onNavigate(action.route)}
-                className="group relative bg-[var(--si-surface)] border border-[var(--si-border)] rounded-2xl p-6 text-left hover:border-[var(--si-border-hover)] transition-all duration-300 overflow-hidden"
+                className={`group relative bg-[var(--si-surface)] border border-[var(--si-border)] rounded-2xl p-6 text-left hover:border-[var(--si-border-hover)] transition-all duration-300 overflow-hidden shadow-lg ${action.shadowColor}`}
               >
                 {/* Gradient background on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+                <div className={`absolute inset-0 bg-gradient-to-br ${action.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
                 
                 <div className="relative z-10">
                   {/* Icon */}
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center mb-4 shadow-lg`}>
-                    <action.icon size={24} className="text-white" />
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <action.icon size={28} className="text-white" />
                   </div>
                   
                   {/* Title */}
-                  <h3 className="text-base font-semibold text-[var(--si-text-primary)] mb-2 group-hover:text-[#9378ff] transition-colors">
+                  <h3 className="text-lg font-bold text-[var(--si-text-primary)] mb-2 group-hover:text-gradient-primary transition-all">
                     {action.title}
                   </h3>
                   
                   {/* Description */}
-                  <p className="text-sm text-[var(--si-text-muted)] mb-4">
+                  <p className="text-sm text-[var(--si-text-muted)] mb-4 leading-relaxed">
                     {action.description}
                   </p>
                   
                   {/* Arrow */}
-                  <div className="flex items-center gap-2 text-sm font-medium text-[#9378ff] opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-2 text-sm font-medium text-[var(--si-accent-primary)] opacity-0 group-hover:opacity-100 transition-all duration-300">
                     <span>Explore</span>
-                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-300" />
                   </div>
                 </div>
               </motion.button>
@@ -286,44 +315,40 @@ export function HomePage({ onNavigate, reducedMotion = false }: HomePageProps) {
           </div>
         </motion.div>
 
-        {/* Recent activity section */}
+        {/* Features section */}
         <motion.div
           variants={introVariants.supporting}
-          className="mt-20 lg:mt-32 pb-12"
+          className="mt-24 lg:mt-32 pb-16"
         >
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-[var(--si-text-primary)]">
-              Recent Activity
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-[var(--si-text-primary)] mb-3">
+              Why HAMOODI SI?
             </h2>
-            <button
-              onClick={() => onNavigate('/activity')}
-              className="text-sm text-[#9378ff] hover:text-[#7c5cff] transition-colors flex items-center gap-1"
-            >
-              View all
-              <ArrowRight size={14} />
-            </button>
+            <p className="text-[var(--si-text-secondary)]">
+              Built for the future of intelligent work
+            </p>
           </div>
           
-          <div className="bg-[var(--si-surface)] border border-[var(--si-border)] rounded-2xl p-8">
-            <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--si-surface-interactive)] flex items-center justify-center">
-                <Sparkles size={24} className="text-[var(--si-text-muted)]" />
-              </div>
-              <h3 className="text-lg font-semibold text-[var(--si-text-primary)] mb-2">
-                No recent activity
-              </h3>
-              <p className="text-sm text-[var(--si-text-muted)] mb-6">
-                Start a conversation or create a project to see your activity here
-              </p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => onNavigate('/chat')}
-                className="px-6 py-3 bg-gradient-to-r from-[#9378ff] to-[#7c5cff] text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + index * 0.1 }}
+                className="p-8 bg-[var(--si-surface)] border border-[var(--si-border)] rounded-2xl hover:border-[var(--si-border-hover)] transition-all duration-300"
               >
-                Start your first conversation
-              </motion.button>
-            </div>
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#8B5CF6]/20 to-[#06B6D4]/20 flex items-center justify-center mb-4">
+                  <feature.icon size={24} className="text-[#8B5CF6]" />
+                </div>
+                <h3 className="text-xl font-bold text-[var(--si-text-primary)] mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-[var(--si-text-muted)] leading-relaxed">
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </div>

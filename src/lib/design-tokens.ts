@@ -2,50 +2,60 @@
 // Part 01: Comprehensive semantic design tokens
 
 export const designTokens = {
-  // Colors - Dark Theme
+  // Colors - Dark Theme (GenSpark-inspired refined palette)
   dark: {
-    bg: '#080B12',
-    surface: '#0E1320',
-    surfaceElevated: '#141B2B',
-    surfaceInteractive: '#1B2537',
+    bg: '#0A0E1A',
+    surface: '#0F1420',
+    surfaceElevated: '#151B2B',
+    surfaceInteractive: '#1C2438',
+    surfaceHover: '#232C42',
     
-    textPrimary: '#F4F7FC',
-    textSecondary: '#A6B3C9',
-    textMuted: '#76859E',
+    textPrimary: '#F8FAFC',
+    textSecondary: '#B4C0D3',
+    textMuted: '#8494A7',
+    textDisabled: '#5A6577',
     
-    accentPrimary: '#9378FF',
-    accentCyan: '#52DAD5',
-    accentLime: '#C2F58D',
+    accentPrimary: '#8B5CF6',
+    accentPrimaryHover: '#7C3AED',
+    accentSecondary: '#06B6D4',
+    accentTertiary: '#10B981',
     
-    success: '#59D9A7',
-    warning: '#F3BD65',
-    danger: '#FF6C7C',
+    success: '#10B981',
+    warning: '#F59E0B',
+    danger: '#EF4444',
+    info: '#3B82F6',
     
-    border: 'rgba(175, 197, 230, 0.11)',
-    borderHover: 'rgba(175, 197, 230, 0.2)',
+    border: 'rgba(148, 163, 184, 0.12)',
+    borderHover: 'rgba(148, 163, 184, 0.24)',
+    borderFocus: 'rgba(139, 92, 246, 0.5)',
   },
   
   // Colors - Light Theme
   light: {
-    bg: '#F7F9FC',
+    bg: '#FAFBFC',
     surface: '#FFFFFF',
-    surfaceElevated: '#F0F3F9',
-    surfaceInteractive: '#E8EDF5',
+    surfaceElevated: '#F8FAFC',
+    surfaceInteractive: '#F1F5F9',
+    surfaceHover: '#E2E8F0',
     
-    textPrimary: '#172033',
-    textSecondary: '#536078',
-    textMuted: '#728097',
+    textPrimary: '#0F172A',
+    textSecondary: '#475569',
+    textMuted: '#64748B',
+    textDisabled: '#94A3B8',
     
-    accentPrimary: '#7C5CFF',
-    accentCyan: '#3DB8B3',
-    accentLime: '#8FD65F',
+    accentPrimary: '#7C3AED',
+    accentPrimaryHover: '#6D28D9',
+    accentSecondary: '#0891B2',
+    accentTertiary: '#059669',
     
-    success: '#3DB87F',
-    warning: '#D99A3D',
-    danger: '#E54D5D',
+    success: '#059669',
+    warning: '#D97706',
+    danger: '#DC2626',
+    info: '#2563EB',
     
-    border: '#E4E9F1',
-    borderHover: '#D0D7E3',
+    border: 'rgba(15, 23, 42, 0.08)',
+    borderHover: 'rgba(15, 23, 42, 0.16)',
+    borderFocus: 'rgba(124, 58, 237, 0.5)',
   },
   
   // Typography
@@ -197,8 +207,8 @@ export function generateCSSVariables(isDark: boolean = true): string {
       --si-text-muted: ${colors.textMuted};
       
       --si-accent-primary: ${colors.accentPrimary};
-      --si-accent-cyan: ${colors.accentCyan};
-      --si-accent-lime: ${colors.accentLime};
+      --si-accent-secondary: ${colors.accentSecondary};
+      --si-accent-tertiary: ${colors.accentTertiary};
       
       --si-success: ${colors.success};
       --si-warning: ${colors.warning};
